@@ -47,7 +47,8 @@ export default function ContentCard({ item, size = 'normal' }) {
     if (!cardRef.current) return;
     const rect = cardRef.current.getBoundingClientRect();
     const margin = 20; 
-    const expansionWidth = (isHovered && iframeLoaded) ? rect.width * 2.66 : rect.width * 1.2;
+    // Match the 440px expansion width
+    const expansionWidth = (isHovered && iframeLoaded) ? 440 : rect.width * 1.2;
     
     let shift = 0;
     const leftBound = rect.left - (expansionWidth - rect.width) / 2;
@@ -134,7 +135,7 @@ export default function ContentCard({ item, size = 'normal' }) {
           console.log(`> Card Trailer found [${id}]: ${trailer.key}`);
           hoverTimeoutRef.current = setTimeout(() => {
             setTrailerKey(trailer.key);
-          }, 150);
+          }, 400); // Small delay to prevent layout thrash
         }
       };
       fetchTrailer();
@@ -151,32 +152,7 @@ export default function ContentCard({ item, size = 'normal' }) {
       '*'
     );
     setIsMuted(nextMuted);
-    const btn = e.currentTarget;
-    btn.style.background = 'rgba(255, 255, 255, 0.7)';
-    setTimeout(() => { btn.style.background = 'rgba(0,0,0,0.6)'; }, 150);
   };
-
-  const iframeFallbackTimeout = useRef(null);
-
-  useEffect(() => {
-    if (!trailerKey || !isHovered) {
-      if (iframeFallbackTimeout.current) {
-        clearTimeout(iframeFallbackTimeout.current);
-        iframeFallbackTimeout.current = null;
-      }
-      return;
-    }
-
-    if (iframeFallbackTimeout.current) clearTimeout(iframeFallbackTimeout.current);
-    iframeFallbackTimeout.current = setTimeout(() => setIframeLoaded(true), 1400);
-
-    return () => {
-      if (iframeFallbackTimeout.current) {
-        clearTimeout(iframeFallbackTimeout.current);
-        iframeFallbackTimeout.current = null;
-      }
-    };
-  }, [trailerKey, isHovered]);
 
   const toggleWishlist = (e) => {
     e.stopPropagation();
@@ -191,9 +167,6 @@ export default function ContentCard({ item, size = 'normal' }) {
       setWishlisted(true);
       addToast('> ADDED TO WATCHLIST ✓', 'success');
     }
-    const btn = e.currentTarget;
-    btn.style.background = 'rgba(255, 255, 255, 0.7)';
-    setTimeout(() => { btn.style.background = 'rgba(0,0,0,0.6)'; }, 150);
   };
 
   return (
@@ -216,15 +189,15 @@ export default function ContentCard({ item, size = 'normal' }) {
     >
       <div style={{
         position: 'absolute',
+        top: isExpanded ? '-40px' : '0',
         left: '50%',
         width: isExpanded ? '440px' : '100%',
         height: isExpanded ? '248px' : '100%',
-        top: isExpanded ? '-20px' : '0', 
         transform: `translateX(calc(-50% + ${edgeShift}px)) ${!isExpanded && isHovered ? 'scale(1.2)' : 'scale(1)'}`,
         borderRadius:   'var(--radius)',
         transition:     'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
         boxShadow:      isHovered ? 'var(--shadow-lg), 0 0 40px var(--accent)' : 'none',
-        willChange:     'width, transform, box-shadow',
+        willChange:     'width, height, transform, box-shadow',
         transformStyle: 'preserve-3d',
         zIndex: 1
       }}>
@@ -238,149 +211,122 @@ export default function ContentCard({ item, size = 'normal' }) {
           transformStyle: 'preserve-3d',
           backfaceVisibility: 'hidden',
         }}>
-        {!loaded && (
-          <div style={{
-            position: 'absolute', inset: 0,
-            background: 'linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.03) 75%)',
-            backgroundSize: '200% 100%',
-            animation: 'shimmer 1.5s infinite linear',
-            zIndex: 1
-          }} />
-        )}
-        <img
-          src={img(poster_path, 'w342')}
-          alt={displayTitle}
-          onLoad={() => setLoaded(true)}
-          style={{
-            position: 'absolute', inset: 0,
-            width: '100%', height: '100%',
-            objectFit: 'cover', transform: 'translateZ(5px)',
-            opacity: loaded && !iframeLoaded ? 1 : 0,
-            transition: 'opacity 0.3s ease',
-            zIndex: 2
-          }}
-          loading="lazy"
-          decoding="async"
-        />
-        {trailerKey && isHovered && (
-          <iframe
-            ref={iframeRef}
-            src={`https://www.youtube-nocookie.com/embed/${trailerKey}?autoplay=1&mute=1&controls=0&modestbranding=1&playsinline=1&loop=1&playlist=${trailerKey}&enablejsapi=1&origin=${window.location.origin}`}
-            title="Trailer"
-            frameBorder="0"
-            allow="autoplay; encrypted-media; fullscreen"
-            allowFullScreen
-            loading="lazy"
-            onLoad={() => setIframeLoaded(true)}
+          {!loaded && (
+            <div style={{
+              position: 'absolute', inset: 0,
+              background: 'linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.03) 75%)',
+              backgroundSize: '200% 100%',
+              animation: 'shimmer 1.5s infinite linear',
+              zIndex: 1
+            }} />
+          )}
+          <img
+            src={img(poster_path, 'w342')}
+            alt={displayTitle}
+            onLoad={() => setLoaded(true)}
             style={{
               position: 'absolute', inset: 0,
               width: '100%', height: '100%',
-              objectFit: 'cover', transform: 'none',
-              pointerEvents: 'none',
-              opacity: iframeLoaded ? 1 : 0,
+              objectFit: 'cover', transform: 'translateZ(5px)',
+              opacity: loaded && !iframeLoaded ? 1 : 0,
               transition: 'opacity 0.3s ease',
-              zIndex: 3 
+              zIndex: 2
             }}
+            loading="lazy"
           />
-        )}
-        <div style={{
-          position: 'absolute', inset: 0,
-          boxShadow: isHovered && !iframeLoaded ? 'inset 0 0 40px rgba(0,0,0,0.6), inset 0 0 10px rgba(0,0,0,0.4)' : 'none',
-          pointerEvents: 'none',
-          transition: 'box-shadow 0.3s ease',
-          zIndex: 4, transform: 'translateZ(6px)'
-        }} />
-        <div style={{
-          position:   'absolute', inset: 0,
-          background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 60%, transparent 100%)',
-          transform:  'translateZ(10px)',
-          zIndex: 5
-        }} />
-
-        <div data-shine style={{
-          position: 'absolute', inset: 0,
-          transition: 'background 0.1s ease',
-          transform: 'translateZ(55px)',
-          pointerEvents: 'none',
-          zIndex: 6
-        }} />
-
-        <div style={{
-          position:      'absolute', top: '12px', left: '12px',
-          background:    'rgba(0,0,0,0.8)', backdropFilter: 'blur(10px)',
-          border:        '1px solid var(--accent)', borderRadius: '4px',
-          color:         'var(--white)',
-          fontSize:      '9px',
-          fontFamily:    "'Montserrat', sans-serif",
-          fontWeight:    900,
-          letterSpacing: '1.5px', textTransform: 'uppercase',
-          padding:       '4px 8px',
-          zIndex:        10
-        }}>
-          {type === 'movie' ? 'MOVIE' : type === 'anime' ? 'ANIME' : 'SERIES'}
-        </div>
-
-        <div style={{
-          position: 'absolute', bottom: 0, left: 0, right: 0,
-          padding:  '12px', transform: 'translateZ(25px)',
-          zIndex: 10
-        }}>
+          {trailerKey && isHovered && (
+            <iframe
+              ref={iframeRef}
+              src={`https://www.youtube.com/embed/${trailerKey}?autoplay=1&mute=1&controls=0&modestbranding=1&playsinline=1&loop=1&playlist=${trailerKey}&enablejsapi=1&origin=${window.location.origin}`}
+              title="Trailer"
+              frameBorder="0"
+              allow="autoplay; encrypted-media"
+              onLoad={() => setIframeLoaded(true)}
+              style={{
+                position: 'absolute', inset: 0,
+                width: '100%', height: '100%',
+                objectFit: 'cover', transform: 'none',
+                opacity: iframeLoaded ? 1 : 0,
+                transition: 'opacity 0.3s ease',
+                zIndex: 3
+              }}
+            />
+          )}
+          
           <div style={{
-            fontFamily:       "'Inter', sans-serif",
-            fontWeight:       600, fontSize: '14px',
-            color:            'var(--white)', lineHeight: 1.2,
-            marginBottom:     '6px',
-            overflow:         isHovered ? 'visible' : 'hidden',
-            display:          isHovered ? 'block' : '-webkit-box',
-            WebkitLineClamp:  isHovered ? 'unset' : 2,
-            WebkitBoxOrient:  'vertical',
-            transition:       'all 0.2s ease',
-            zIndex: 10, position: 'relative'
-          }}>
-            {displayTitle}
-          </div>
-          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-            <span style={{
-              background:  'var(--accent)', borderRadius: '4px',
-              color:       'var(--white)', fontSize: '11px',
-              padding:     '2px 6px', fontWeight: 900,
-              fontFamily:  "'Montserrat', sans-serif", display: 'flex', alignItems: 'center', gap: '2px'
-            }}>
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-              {vote_average?.toFixed(1) || 'N/A'}
-            </span>
-            <span style={{ color: '#fff', fontSize: '12px', fontFamily: "'Inter', sans-serif", fontWeight: 700 }}>
-              {year}
-            </span>
-          </div>
-        </div>
+            position: 'absolute', inset: 0,
+            boxShadow: isHovered && !iframeLoaded ? 'inset 0 0 40px rgba(0,0,0,0.6), inset 0 0 10px rgba(0,0,0,0.4)' : 'none',
+            pointerEvents: 'none',
+            transition: 'box-shadow 0.3s ease',
+            zIndex: 4, transform: 'translateZ(6px)'
+          }} />
 
-        <div style={{
-          position:   'absolute', inset: 0,
-          display:    'flex', flexDirection: 'column',
-          alignItems: 'center', justifyContent: 'center',
-          opacity:    isHovered && !iframeLoaded ? 1 : 0, 
-          background: 'radial-gradient(circle, transparent 40%, rgba(0,0,0,0.5) 100%)',
-          transition: 'all 0.3s ease',
-          zIndex: 30, padding: '20px', textAlign: 'center',
-          pointerEvents: 'none'
-        }}>
-          <div style={{ 
-            width: '56px', height: '56px', borderRadius: '50%',
-            background: 'var(--accent)', 
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            boxShadow: 'var(--glow-md)', marginBottom: '16px',
-            transform: isHovered ? 'scale(1)' : 'scale(0.8)',
-            transition: 'transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+          <div style={{
+            position:   'absolute', inset: 0,
+            background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 60%, transparent 100%)',
+            transform:  'translateZ(10px)',
+            zIndex: 5
+          }} />
+
+          <div data-shine style={{
+            position: 'absolute', inset: 0,
+            transition: 'background 0.1s ease',
+            transform: 'translateZ(55px)',
+            pointerEvents: 'none',
+            zIndex: 6
+          }} />
+
+          <div style={{
+            position:      'absolute', top: '12px', left: '12px',
+            background:    'rgba(0,0,0,0.8)', backdropFilter: 'blur(10px)',
+            border:        '1px solid var(--accent)', borderRadius: '4px',
+            color:         'var(--white)',
+            fontSize:      '9px',
+            fontFamily:    "'Montserrat', sans-serif",
+            fontWeight:    900,
+            letterSpacing: '1.5px', textTransform: 'uppercase',
+            padding:       '4px 8px',
+            zIndex:        20
           }}>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="white" stroke="none" style={{ marginLeft: '4px' }}><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+            {type === 'movie' ? 'MOVIE' : type === 'anime' ? 'ANIME' : 'SERIES'}
           </div>
-        </div>
+
+          <div style={{
+            position: 'absolute', bottom: 0, left: 0, right: 0,
+            padding:  '16px', transform: 'translateZ(25px)',
+            zIndex: 30
+          }}>
+            <div style={{
+              fontFamily:       "'Inter', sans-serif",
+              fontWeight:       700, fontSize: '15px',
+              color:            'var(--white)', lineHeight: 1.2,
+              marginBottom:     '6px',
+              textShadow:       '0 2px 4px rgba(0,0,0,0.5)',
+              zIndex: 30
+            }}>
+              {displayTitle}
+            </div>
+            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+              <span style={{
+                background:  'var(--accent)', borderRadius: '4px',
+                color:       'var(--white)', fontSize: '11px',
+                padding:     '2px 6px', fontWeight: 900,
+                fontFamily:  "'Montserrat', sans-serif", display: 'flex', alignItems: 'center', gap: '2px'
+              }}>
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                {vote_average?.toFixed(1) || 'N/A'}
+              </span>
+              <span style={{ color: '#fff', fontSize: '12px', fontFamily: "'Inter', sans-serif", fontWeight: 700 }}>
+                {year}
+              </span>
+            </div>
+          </div>
         </div> 
+
         {isHovered && (
           <div style={{
             position: 'absolute', top: '12px', right: '12px',
-            display: 'flex', gap: '8px', zIndex: 9999,
+            display: 'flex', gap: '8px', zIndex: 100,
             pointerEvents: 'auto',
             transform: `translateX(${edgeShift}px)`,
             transition: 'transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)'
@@ -394,11 +340,8 @@ export default function ContentCard({ item, size = 'normal' }) {
                   border: `1px solid rgba(255,255,255,0.1)`,
                   color: 'var(--white)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  transition: 'all 0.2s', cursor: 'pointer',
-                  boxShadow: '0 4px 15px rgba(0,0,0,0.5)'
+                  cursor: 'pointer'
                 }}
-                onMouseEnter={e => { e.currentTarget.style.background = 'var(--white)'; e.currentTarget.style.color = 'var(--black)'; }}
-                onMouseLeave={e => { e.currentTarget.style.background = 'rgba(0,0,0,0.6)'; e.currentTarget.style.color = 'var(--white)'; }}
               >
                 {isMuted ? (
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>
@@ -415,11 +358,8 @@ export default function ContentCard({ item, size = 'normal' }) {
                 border:     `1px solid rgba(255,255,255,0.1)`,
                 color:      wishlisted ? 'var(--accent)' : 'rgba(255,255,255,0.7)',
                 display:    'flex', alignItems: 'center', justifyContent: 'center',
-                boxShadow:  wishlisted ? '0 0 10px rgba(255,0,0,0.3)' : '0 4px 15px rgba(0,0,0,0.5)',
-                transition: 'all 0.2s', cursor: 'pointer'
+                cursor:     'pointer'
               }}
-              onMouseEnter={e => { e.currentTarget.style.background = 'var(--white)'; e.currentTarget.style.color = 'var(--black)'; }}
-              onMouseLeave={e => { e.currentTarget.style.background = 'rgba(0,0,0,0.6)'; e.currentTarget.style.color = wishlisted ? 'var(--accent)' : 'rgba(255,255,255,0.7)'; }}
             >
               {wishlisted ? (
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
