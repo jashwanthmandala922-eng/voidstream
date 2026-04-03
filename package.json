@@ -26,8 +26,10 @@
   },
   "scripts": {
     "start": "concurrently \"npm run server\" \"npm run client\"",
-    "client": "react-scripts start",
-    "server": "node server/index.js",
+    "client": "cross-env PORT=3000 react-scripts start",
+    "client:alt": "cross-env PORT=3001 react-scripts start",
+    "server": "cross-env PORT=5000 node server/index.js",
+    "server:alt": "cross-env PORT=5001 node server/index.js",
     "dev": "npm run start",
     "build": "react-scripts build",
     "test": "react-scripts test",
@@ -52,6 +54,7 @@
     ]
   },
   "devDependencies": {
-    "concurrently": "^9.2.1"
+    "concurrently": "^9.2.1",
+    "cross-env": "^7.0.3"
   }
 }

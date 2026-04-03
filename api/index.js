@@ -5,6 +5,7 @@ const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 
 const app = express();
+app.set('trust proxy', 'loopback');
 
 // 1. RATE LIMITING
 const limiter = rateLimit({
@@ -17,7 +18,12 @@ const limiter = rateLimit({
 
 app.use(cors());
 app.use(express.json());
-app.use('/api', limiter); // Apply to all API routes
+
+if (process.env.NODE_ENV === 'production') {
+  app.use('/api', limiter); // Apply rate limiting in production
+} else {
+  app.use('/api', (req, res, next) => next()); // Skip limiter during local dev
+}
 
 // 2. SECRET MANAGEMENT (TMDB Proxy)
 const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
@@ -29,17 +35,30 @@ if (TMDB_KEY) {
     console.error('CRITICAL: TMDB_API_KEY is missing from environment variables');
 }
 
+const requireTmdbKey = (req, res, next) => {
+  if (!TMDB_KEY) {
+    return res.status(500).json({ error: 'TMDB_API_KEY is missing from environment' });
+  }
+  next();
+};
+
+app.use('/api/tmdb', requireTmdbKey);
+
 app.get(/^\/api\/tmdb\/(.*)/, async (req, res) => {
   try {
     const endpoint = req.params[0];
     const isV4 = TMDB_KEY?.length > 100;
     
     const config = {
-      params: { ...req.query }
+      params: { ...req.query },
+      headers: {
+        'Accept': 'application/json',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+      }
     };
 
     if (isV4) {
-      config.headers = { Authorization: `Bearer ${TMDB_KEY}` };
+      config.headers.Authorization = `Bearer ${TMDB_KEY}`;
     } else {
       config.params.api_key = TMDB_KEY;
     }
@@ -47,7 +66,12 @@ app.get(/^\/api\/tmdb\/(.*)/, async (req, res) => {
     const response = await axios.get(`${TMDB_BASE_URL}/${endpoint}`, config);
     res.json(response.data);
   } catch (error) {
-    res.status(error.response?.status || 500).json(error.response?.data || { error: 'Proxy Error' });
+    console.error(`! Proxy Error calling TMDB:`, error);
+    if (error.response) {
+      console.error(`  Status: ${error.response.status}`);
+      console.error(`  Response data:`, error.response.data);
+    }
+    res.status(error.response?.status || 500).json({ error: 'Proxy Error' });
   }
 });
 
