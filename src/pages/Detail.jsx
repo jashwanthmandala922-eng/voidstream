@@ -6,8 +6,9 @@ import {
 } from '../services/tmdbService';
 import {
   isWishlisted, addToWishlist, removeFromWishlist,
-  getHistory, addToHistory
+  getHistory
 } from '../services/storageService';
+
 import ContentCard from '../components/cards/ContentCard';
 import VideoPlayer from '../components/content/VideoPlayer';
 import { useToast } from '../context/ToastContext';
@@ -50,6 +51,22 @@ export default function Detail({ type }) {
       setLoading(false);
     }).catch(() => setLoading(false));
   }, [id, type, isMovie, mediaId]);
+
+  const trailerVideo = detail?.videos?.results?.find(v => v.type === 'Trailer' && v.site === 'YouTube');
+
+  // Safety fallback for background trailer loading
+  useEffect(() => {
+    if (!trailerVideo) {
+      setBgLoaded(false);
+      return;
+    }
+    const timer = setTimeout(() => {
+      setBgLoaded(true);
+    }, 4000); // 4s fallback
+    return () => clearTimeout(timer);
+  }, [trailerVideo]);
+
+
 
   const handleSeasonChange = (num) => {
     setSelSeason(num);
@@ -124,15 +141,15 @@ export default function Detail({ type }) {
     </div>
   );
 
-  const title   = detail.title || detail.name;
-  const trailerVideo = detail.videos?.results?.find(v => v.type === 'Trailer' && v.site === 'YouTube');
-  const year    = (detail.release_date || detail.first_air_date || '').split('-')[0];
-  const runtime = detail.runtime
+  const title   = detail?.title || detail?.name;
+  const year    = (detail?.release_date || detail?.first_air_date || '').split('-')[0];
+  const runtime = detail?.runtime
     ? `${detail.runtime}m`
-    : detail.number_of_seasons
+    : detail?.number_of_seasons
       ? `${detail.number_of_seasons} Season${detail.number_of_seasons > 1 ? 's' : ''}`
       : '';
-  const genres  = detail.genres || [];
+  const genres  = detail?.genres || [];
+
 
   const btnStyle = (primary = false) => ({
     fontFamily: "'Inter', sans-serif", fontWeight: 600, fontSize: '14px',
@@ -151,7 +168,7 @@ export default function Detail({ type }) {
         .detail-info-panel {
           display: flex; gap: 48px; flex-wrap: wrap;
           padding: clamp(32px, 8vw, 64px) var(--page-x, 5vw) 0;
-          position: relative; z-index: 2;
+          position: relative; z-index: 4;
         }
         .detail-poster {
           width: clamp(160px, 25vw, 280px); flex-shrink: 0;
@@ -206,11 +223,16 @@ export default function Detail({ type }) {
                 style={{
                   width: '100vw', height: '56.25vw', minHeight: '100vh', minWidth: '177.77vh',
                   position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
-                  pointerEvents: 'none', opacity: bgLoaded ? 0.8 : 0, transition: 'opacity 1.5s ease'
+                  opacity: bgLoaded ? 1 : 0, transition: 'opacity 1.5s ease',
+                  zIndex: 5, // Above backdrop image and gradients
+                  border: 'none',
+                  filter: 'contrast(1.1) brightness(1.1)'
                 }}
                 onLoad={() => setBgLoaded(true)}
                 frameBorder="0" allow="autoplay; encrypted-media"
               />
+
+
             </>
           )}
           <div style={{
@@ -218,10 +240,11 @@ export default function Detail({ type }) {
             backgroundImage: `url(${img(detail.backdrop_path, 'w1280')})`,
             backgroundSize: 'cover', backgroundPosition: 'center top',
             filter: 'brightness(0.2) saturate(0.8)', opacity: trailerVideo && bgLoaded ? 0 : 0.6,
-            transition: 'opacity 1.5s ease', zIndex: -1
+            transition: 'opacity 1.5s ease', zIndex: 1
           }} />
-          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, #000 0%, rgba(0,0,0,0.7) 30%, transparent 100%)' }} />
-          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, #000 0%, rgba(0,0,0,0.4) 40%, transparent 100%)' }} />
+          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, #000 0%, rgba(0,0,0,0.7) 30%, transparent 100%)', zIndex: 3 }} />
+          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, #000 0%, rgba(0,0,0,0.4) 40%, transparent 100%)', zIndex: 3 }} />
+
         </div>
 
         {/* INFO PANEL */}

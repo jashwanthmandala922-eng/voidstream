@@ -30,6 +30,8 @@ if (process.env.NODE_ENV === 'production') {
 // 2. SECRET MANAGEMENT (TMDB Proxy)
 // The API Key is appended here ON THE SERVER, never exposed to the client
 const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
+const tmdbAgent = new (require('https').Agent)({ family: 4, keepAlive: true });
+
 const TMDB_KEY = process.env.TMDB_API_KEY;
 if (TMDB_KEY) {
     console.log(`> TMDB_KEY LOADED: ${TMDB_KEY.slice(0, 5)}... (Length: ${TMDB_KEY.length})`);
@@ -53,11 +55,11 @@ app.get(/^\/api\/tmdb\/(.*)/, async (req, res) => {
     
     const config = {
       params: { ...req.query },
-      headers: {
-        'Accept': 'application/json',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-      }
+      headers: { 'Accept': 'application/json' },
+      httpsAgent: tmdbAgent,
+      timeout: 15000
     };
+
 
     if (isV4) {
       config.headers.Authorization = `Bearer ${TMDB_KEY}`;
@@ -65,37 +67,34 @@ app.get(/^\/api\/tmdb\/(.*)/, async (req, res) => {
       config.params.api_key = TMDB_KEY;
     }
 
-    const tmdbUrl = `${TMDB_BASE_URL}/${endpoint}`;
-    console.log(`> Proxying to TMDB: ${tmdbUrl}`);
-    
-    const response = await axios.get(tmdbUrl, config);
+    const response = await axios.get(`${TMDB_BASE_URL}/${endpoint}`, config);
+
     res.json(response.data);
   } catch (error) {
     console.error(`! Proxy Error calling TMDB:`, error);
     if (error.response) {
-      console.error(`  Status: ${error.response.status}`);
-      console.error(`  Response data:`, error.response.data);
+      console.error(`  status: ${error.response.status}`);
+      console.error(`  data:`, error.response.data);
     }
     res.status(error.response?.status || 500).json({ error: 'Proxy Error' });
   }
 });
 
-const MAX_PORT_RETRIES = 10;
 
-const startApp = (port, attempt = 1) => {
+const startApp = (port) => {
   const server = app.listen(port, () => {
     console.log(`Security Proxy running on port ${port}`);
   });
 
   server.on('error', (err) => {
-    if (err.code === 'EADDRINUSE' && attempt <= MAX_PORT_RETRIES) {
-      const nextPort = port + 1;
-      console.warn(`Port ${port} is in use; retrying with port ${nextPort} (${attempt}/${MAX_PORT_RETRIES})`);
-      setTimeout(() => startApp(nextPort, attempt + 1), 200);
+    if (err.code === 'EADDRINUSE') {
+      console.error(`FATAL: Port ${port} is already in use. React proxy expects http://localhost:5000 by default.`);
+      console.error(`Set PORT to a free port or run 'npm run server:alt' (5001), and adjust your client proxy if needed.`);
+      console.error(`You can set PORT with environment variable or ensure server script is changed accordingly.`);
     } else {
-      console.error(`Failed to start server on port ${port}:`, err.message);
-      process.exit(1);
+      console.error(`Failed to start server on port ${port}:`, err);
     }
+    process.exit(1);
   });
 };
 

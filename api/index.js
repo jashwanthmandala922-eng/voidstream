@@ -49,12 +49,13 @@ app.get(/^\/api\/tmdb\/(.*)/, async (req, res) => {
     const endpoint = req.params[0];
     const isV4 = TMDB_KEY?.length > 100;
     
+    const https = require('https');
+    const agent = new https.Agent({ family: 4 });
+
     const config = {
       params: { ...req.query },
-      headers: {
-        'Accept': 'application/json',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-      }
+      headers: { 'Accept': 'application/json' },
+      httpsAgent: agent
     };
 
     if (isV4) {
@@ -64,16 +65,14 @@ app.get(/^\/api\/tmdb\/(.*)/, async (req, res) => {
     }
 
     const response = await axios.get(`${TMDB_BASE_URL}/${endpoint}`, config);
+
     res.json(response.data);
   } catch (error) {
-    console.error(`! Proxy Error calling TMDB:`, error);
-    if (error.response) {
-      console.error(`  Status: ${error.response.status}`);
-      console.error(`  Response data:`, error.response.data);
-    }
+    console.error(`! Proxy Error:`, error.message);
     res.status(error.response?.status || 500).json({ error: 'Proxy Error' });
   }
 });
+
 
 // For Vercel, we export the app instead of calling listen()
 module.exports = app;

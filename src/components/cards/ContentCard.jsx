@@ -27,6 +27,7 @@ export default function ContentCard({ item, size = 'normal' }) {
     isWishlisted(item.id, type)
       .then(setWishlisted);
   }, [item.id, type]);
+
   const [trailerKey, setTrailerKey] = useState(null);
   const [isHovered, setIsHovered] = useState(false);
   const [iframeLoaded, setIframeLoaded] = useState(false);
@@ -39,17 +40,14 @@ export default function ContentCard({ item, size = 'normal' }) {
   const year  = (release_date || first_air_date || '').split('-')[0];
   const route = type === 'movie' ? '/movie' : type === 'anime' ? '/anime' : '/series';
 
-  // ── 3D TILT via CSS custom properties (no layout thrash) ────────
   const rafId = useRef(null);
-
   const isExpanded = isHovered && iframeLoaded;
 
   const checkBounds = useCallback(() => {
     if (!cardRef.current) return;
     const rect = cardRef.current.getBoundingClientRect();
     const margin = 20; 
-    const isExpanded = isHovered && iframeLoaded;
-    const expansionWidth = isExpanded ? rect.width * 1.6 : rect.width * 1.2;
+    const expansionWidth = (isHovered && iframeLoaded) ? rect.width * 2.66 : rect.width * 1.2;
     
     let shift = 0;
     const leftBound = rect.left - (expansionWidth - rect.width) / 2;
@@ -66,7 +64,6 @@ export default function ContentCard({ item, size = 'normal' }) {
    useEffect(() => {
      if (isHovered) {
        checkBounds();
-       // Listen for resize to update bounds if window changes
        window.addEventListener('resize', checkBounds);
        return () => window.removeEventListener('resize', checkBounds);
      }
@@ -77,7 +74,6 @@ export default function ContentCard({ item, size = 'normal' }) {
     const card = cardRef.current;
     if (!card) return;
 
-    // Use rAF for buttery smooth 60fps performance
     if (rafId.current) cancelAnimationFrame(rafId.current);
     rafId.current = requestAnimationFrame(() => {
       const rect = card.getBoundingClientRect();
@@ -115,8 +111,6 @@ export default function ContentCard({ item, size = 'normal' }) {
   const handleMouseEnter = useCallback((e) => {
     setIsHovered(true);
     if (getSettings().trailerOnHover) {
-      // Immediate fetch (preloading strategy)
-      // Intelligent preloading with fallback
       const fetchTrailer = async () => {
         const tryFetch = async (targetType) => {
           try {
@@ -128,17 +122,16 @@ export default function ContentCard({ item, size = 'normal' }) {
           } catch { return null; }
         };
 
-        // 1. Initial attempt based on detected type
         const primaryType = (type === 'tv' || type === 'anime' || type === 'series') ? 'tv' : 'movie';
         let trailer = await tryFetch(primaryType);
 
-        // 2. Fallback attempt (TV <-> MOVIE crossover) if nothing found
         if (!trailer) {
           const fallbackType = primaryType === 'tv' ? 'movie' : 'tv';
           trailer = await tryFetch(fallbackType);
         }
 
         if (trailer) {
+          console.log(`> Card Trailer found [${id}]: ${trailer.key}`);
           hoverTimeoutRef.current = setTimeout(() => {
             setTrailerKey(trailer.key);
           }, 150);
@@ -158,18 +151,37 @@ export default function ContentCard({ item, size = 'normal' }) {
       '*'
     );
     setIsMuted(nextMuted);
-    
-    // Pulse feedback
     const btn = e.currentTarget;
     btn.style.background = 'rgba(255, 255, 255, 0.7)';
     setTimeout(() => { btn.style.background = 'rgba(0,0,0,0.6)'; }, 150);
   };
 
+  const iframeFallbackTimeout = useRef(null);
+
+  useEffect(() => {
+    if (!trailerKey || !isHovered) {
+      if (iframeFallbackTimeout.current) {
+        clearTimeout(iframeFallbackTimeout.current);
+        iframeFallbackTimeout.current = null;
+      }
+      return;
+    }
+
+    if (iframeFallbackTimeout.current) clearTimeout(iframeFallbackTimeout.current);
+    iframeFallbackTimeout.current = setTimeout(() => setIframeLoaded(true), 1400);
+
+    return () => {
+      if (iframeFallbackTimeout.current) {
+        clearTimeout(iframeFallbackTimeout.current);
+        iframeFallbackTimeout.current = null;
+      }
+    };
+  }, [trailerKey, isHovered]);
+
   const toggleWishlist = (e) => {
     e.stopPropagation();
     e.preventDefault();
     const itemData = { id, type, title: displayTitle, poster: img(poster_path), rating: vote_average, year };
-    
     if (wishlisted) {
       removeFromWishlist(id, type);
       setWishlisted(false);
@@ -179,16 +191,10 @@ export default function ContentCard({ item, size = 'normal' }) {
       setWishlisted(true);
       addToast('> ADDED TO WATCHLIST ✓', 'success');
     }
-
-    // Pulse feedback
     const btn = e.currentTarget;
     btn.style.background = 'rgba(255, 255, 255, 0.7)';
     setTimeout(() => { btn.style.background = 'rgba(0,0,0,0.6)'; }, 150);
   };
-
-  // Reposition logic based on hover index (for pushing effect)
-  // Since we use flexbox, changing the width already handles pushing.
-  // We just need to handle the viewport boundaries for the expanded card.
 
   return (
     <div
@@ -208,13 +214,12 @@ export default function ContentCard({ item, size = 'normal' }) {
         transition:     'z-index 0.3s step-end'
       }}
     >
-      {/* EXPANDING CONTAINER (LAYOUT STABLE) */}
       <div style={{
         position: 'absolute',
-        top: 0,
         left: '50%',
-        width: isExpanded ? 'calc(var(--card-w) * 2.66)' : '100%',
-        height: '100%',
+        width: isExpanded ? '440px' : '100%',
+        height: isExpanded ? '248px' : '100%',
+        top: isExpanded ? '-20px' : '0', 
         transform: `translateX(calc(-50% + ${edgeShift}px)) ${!isExpanded && isHovered ? 'scale(1.2)' : 'scale(1)'}`,
         borderRadius:   'var(--radius)',
         transition:     'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -223,7 +228,6 @@ export default function ContentCard({ item, size = 'normal' }) {
         transformStyle: 'preserve-3d',
         zIndex: 1
       }}>
-        {/* STATIC INNER CARD (CLIPPED) */}
         <div style={{
           position: 'absolute', inset: 0, borderRadius: 'var(--radius)',
           background: '#000', 
@@ -234,7 +238,6 @@ export default function ContentCard({ item, size = 'normal' }) {
           transformStyle: 'preserve-3d',
           backfaceVisibility: 'hidden',
         }}>
-        {/* SKELETON while image loads */}
         {!loaded && (
           <div style={{
             position: 'absolute', inset: 0,
@@ -244,8 +247,6 @@ export default function ContentCard({ item, size = 'normal' }) {
             zIndex: 1
           }} />
         )}
-
-        {/* POSTER */}
         <img
           src={img(poster_path, 'w342')}
           alt={displayTitle}
@@ -261,55 +262,49 @@ export default function ContentCard({ item, size = 'normal' }) {
           loading="lazy"
           decoding="async"
         />
-
-        {/* TRAILER IFRAME (Integrated) */}
         {trailerKey && isHovered && (
           <iframe
             ref={iframeRef}
             src={`https://www.youtube-nocookie.com/embed/${trailerKey}?autoplay=1&mute=1&controls=0&modestbranding=1&playsinline=1&loop=1&playlist=${trailerKey}&enablejsapi=1&origin=${window.location.origin}`}
             title="Trailer"
             frameBorder="0"
-            allow="autoplay; encrypted-media"
+            allow="autoplay; encrypted-media; fullscreen"
+            allowFullScreen
+            loading="lazy"
             onLoad={() => setIframeLoaded(true)}
             style={{
               position: 'absolute', inset: 0,
               width: '100%', height: '100%',
-              objectFit: 'cover', transform: 'translateZ(2px)',
+              objectFit: 'cover', transform: 'none',
               pointerEvents: 'none',
               opacity: iframeLoaded ? 1 : 0,
               transition: 'opacity 0.3s ease',
-              zIndex: 1
+              zIndex: 3 
             }}
           />
         )}
-
-        {/* VIGNETTE EDGE BLACKOUT */}
         <div style={{
           position: 'absolute', inset: 0,
           boxShadow: isHovered && !iframeLoaded ? 'inset 0 0 40px rgba(0,0,0,0.6), inset 0 0 10px rgba(0,0,0,0.4)' : 'none',
           pointerEvents: 'none',
           transition: 'box-shadow 0.3s ease',
-          zIndex: 3, transform: 'translateZ(6px)'
+          zIndex: 4, transform: 'translateZ(6px)'
         }} />
-
-        {/* GRADIENT OVERLAY */}
         <div style={{
           position:   'absolute', inset: 0,
-          background: 'linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 40%, transparent 100%)',
+          background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 60%, transparent 100%)',
           transform:  'translateZ(10px)',
-          zIndex: 4
+          zIndex: 5
         }} />
 
-        {/* HOLOGRAPHIC SHINE */}
         <div data-shine style={{
           position: 'absolute', inset: 0,
           transition: 'background 0.1s ease',
           transform: 'translateZ(55px)',
           pointerEvents: 'none',
-          zIndex: 5
+          zIndex: 6
         }} />
 
-        {/* TYPE BADGE */}
         <div style={{
           position:      'absolute', top: '12px', left: '12px',
           background:    'rgba(0,0,0,0.8)', backdropFilter: 'blur(10px)',
@@ -325,7 +320,6 @@ export default function ContentCard({ item, size = 'normal' }) {
           {type === 'movie' ? 'MOVIE' : type === 'anime' ? 'ANIME' : 'SERIES'}
         </div>
 
-        {/* BOTTOM INFO */}
         <div style={{
           position: 'absolute', bottom: 0, left: 0, right: 0,
           padding:  '12px', transform: 'translateZ(25px)',
@@ -361,7 +355,6 @@ export default function ContentCard({ item, size = 'normal' }) {
           </div>
         </div>
 
-        {/* PLAY & BLUR OVERLAY */}
         <div style={{
           position:   'absolute', inset: 0,
           display:    'flex', flexDirection: 'column',
@@ -372,7 +365,6 @@ export default function ContentCard({ item, size = 'normal' }) {
           zIndex: 30, padding: '20px', textAlign: 'center',
           pointerEvents: 'none'
         }}>
-          {/* CENTERED PLAY ICON */}
           <div style={{ 
             width: '56px', height: '56px', borderRadius: '50%',
             background: 'var(--accent)', 
@@ -384,8 +376,7 @@ export default function ContentCard({ item, size = 'normal' }) {
             <svg width="24" height="24" viewBox="0 0 24 24" fill="white" stroke="none" style={{ marginLeft: '4px' }}><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
           </div>
         </div>
-        </div> {/* END STATIC INNER CARD */}
-        {/* ACTIONS ROW (Pinned to card corner, unaffected by 3D tilt) */}
+        </div> 
         {isHovered && (
           <div style={{
             position: 'absolute', top: '12px', right: '12px',
@@ -438,7 +429,7 @@ export default function ContentCard({ item, size = 'normal' }) {
             </button>
           </div>
         )}
-      </div> {/* END EXPANDING CONTAINER */}
+      </div>
     </div>
   );
 }

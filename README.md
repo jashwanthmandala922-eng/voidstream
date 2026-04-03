@@ -20,9 +20,8 @@
 5. If 3000 or 5000 is taken, use alternate ports:
 
    - Frontend: `npm run client:alt` (3001) or set `PORT` manually.
-   - Backend: use `npm run server:alt` (5001) or set `PORT` manually:
-     - Linux/macOS: `export PORT=5001 && npm run server`
-     - Windows PowerShell: `cross-env PORT=5001 npm run server`
+   - Backend: use `npm run server:alt` (5001) or set `PORT` in `.env` (e.g., `PORT=5001`).
+   - Note: `server` script uses `cross-env PORT=5000` and takes precedence, so to change backend you should use `server:alt` or edit `.env` (and ensure `npm run server` picks it if you remove/override `cross-env`).
    - This mirrors the same pattern as the client alternative and avoids local conflicts.
 
 ## Vercel

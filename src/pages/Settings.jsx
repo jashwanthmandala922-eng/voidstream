@@ -10,7 +10,8 @@ import { logoutUser } from '../services/authService';
 import { useNavigate } from 'react-router-dom';
 import { exitGuestMode } from '../services/storageService';
 import { updateProfile } from 'firebase/auth';
-import { auth } from '../config/firebase';
+// import { auth } from '../config/firebase';
+
 
 const CATEGORIES = [
   { id: 'appearance', label: '[01] APPEARANCE' },

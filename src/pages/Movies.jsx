@@ -11,7 +11,8 @@ const SORT_OPTIONS = [
 ];
 
 export default function Movies() {
-  const [] = useSearchParams();
+  useSearchParams();
+
   const [items,    setItems]    = useState([]);
   const [genres,   setGenres]   = useState([]);
   const [loading,  setLoading]  = useState(true);

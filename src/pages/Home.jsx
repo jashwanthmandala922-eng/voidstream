@@ -4,7 +4,8 @@ import {
   getTrending, getPopMovies, getPopSeries,
   getAnime, getNowPlaying, getTopRated
 } from '../services/tmdbService';
-import { getHistory, getSettings } from '../services/storageService';
+import { getHistory } from '../services/storageService';
+
 import ContentCard from '../components/cards/ContentCard';
 import Hero from '../components/content/Hero';
 import { useAuth } from '../context/AuthContext';
@@ -282,6 +283,7 @@ function SkeletonCard() {
 }
 
 // ── BRAND CARDS ──────────────────────────────────────────────────
+/*
 function BrandCards() {
   const brands = [
     { name: 'disney',   img: 'https://placehold.co/400x225/000814/white?text=DISNEY+' },
@@ -308,12 +310,15 @@ function BrandCards() {
     </div>
   );
 }
+*/
+
 
 // ── CONTINUE WATCHING ROW ─────────────────────────────────────────
 function ContinueWatchingRow({ history, setHistory }) {
   const navigate = useNavigate();
   const scrollRef = useRef(null);
-  const { auth } = useAuth();
+  useAuth();
+
   const [showLeft, setShowLeft] = useState(false);
   const [showRight, setShowRight] = useState(true);
 

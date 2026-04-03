@@ -48,8 +48,8 @@ const SOURCES = [
     const iframeRef       = useRef(null);
     const dropdownRef     = useRef(null);
     const controlsTimeout = useRef(null);
-    const lastMoveTime    = useRef(0);
     const cachedRect      = useRef(null);
+
 
     const [srcIdx,       setSrcIdx]       = useState(0);
     const [theatre,      setTheatre]      = useState(false);
@@ -172,9 +172,8 @@ const SOURCES = [
     }
   };
 
-  const episodeLabel = type !== 'movie'
-    ? `S${String(season).padStart(2,'0')}E${String(episode).padStart(2,'0')}${episodeTitle ? ` — "${episodeTitle}"` : ''}`
-    : null;
+  // Removed unused episodeLabel
+
 
   /* ─────────────────────────  PLAYER SHELL  ───────────────────── */
   return (

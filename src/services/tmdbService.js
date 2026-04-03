@@ -34,52 +34,59 @@ const get = (endpoint, params = {}) =>
 
 
 // HOME ROWS
-export const getTrending   = () => get('/trending/all/week');
-export const getPopMovies  = () => get('/movie/popular');
-export const getPopSeries  = () => get('/tv/popular');
-export const getNowPlaying = () => get('/movie/now_playing');
-export const getTopRated   = () => get('/movie/top_rated');
-export const getTopRatedTV = () => get('/tv/top_rated');
+export const getTrending   = () => get('trending/all/week');
+export const getPopMovies  = () => get('movie/popular');
+export const getPopSeries  = () => get('tv/popular');
+export const getNowPlaying = () => get('movie/now_playing');
+export const getTopRated   = () => get('movie/top_rated');
+export const getTopRatedTV = () => get('tv/top_rated');
+
 
 // DISCOVER (with filters)
 export const discoverMovies = (params) =>
-  get('/discover/movie', { sort_by: 'popularity.desc', ...params });
+  get('discover/movie', { sort_by: 'popularity.desc', ...params });
 
 export const discoverTV = (params) =>
-  get('/discover/tv', { sort_by: 'popularity.desc', ...params });
+  get('discover/tv', { sort_by: 'popularity.desc', ...params });
+
 
 export const getAnime = (params) =>
-  get('/discover/tv', {
+  get('discover/tv', {
     with_genres: 16,
     sort_by: 'popularity.desc',
     ...params
   });
 
+
 // DETAIL
 export const getMovie = (id) =>
-  get(`/movie/${id}`, { append_to_response: 'videos,credits' });
+  get(`movie/${id}`, { append_to_response: 'videos,credits' });
 
 export const getTVShow = (id) =>
-  get(`/tv/${id}`, { append_to_response: 'videos,credits' });
+  get(`tv/${id}`, { append_to_response: 'videos,credits' });
 
 export const getSeason = (id, season) =>
-  get(`/tv/${id}/season/${season}`);
+  get(`tv/${id}/season/${season}`);
 
 export const getVideos = (id, type) =>
-  get(`/${type}/${id}/videos`);
+  get(`${type}/${id}/videos`);
+
 
 // SIMILAR
-export const getSimilarMovies = (id) => get(`/movie/${id}/similar`);
-export const getSimilarTV     = (id) => get(`/tv/${id}/similar`);
+export const getSimilarMovies = (id) => get(`movie/${id}/similar`);
+export const getSimilarTV     = (id) => get(`tv/${id}/similar`);
+
 
 // SEARCH
 export const searchAll    = (query, page = 1) =>
-  get('/search/multi',  { query, page });
+  get('search/multi',  { query, page });
 export const searchMovies = (query, page = 1) =>
-  get('/search/movie',  { query, page });
+  get('search/movie',  { query, page });
 export const searchTV     = (query, page = 1) =>
-  get('/search/tv',     { query, page });
+  get('search/tv',     { query, page });
+
 
 // GENRES
-export const getMovieGenres = () => get('/genre/movie/list');
-export const getTVGenres    = () => get('/genre/tv/list');
+export const getMovieGenres = () => get('genre/movie/list');
+export const getTVGenres    = () => get('genre/tv/list');
+
