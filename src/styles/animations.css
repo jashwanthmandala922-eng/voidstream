@@ -1,0 +1,100 @@
+/* GLITCH TEXT */
+@keyframes glitch {
+  0%, 90%, 100% {
+    text-shadow: 2px 0 #00FF41, -2px 0 #00D4FF;
+    transform: none;
+  }
+  92% {
+    text-shadow: -4px 0 #FF003C, 4px 0 #00FF41;
+    transform: translate(-3px, 0) skewX(-2deg);
+  }
+  94% {
+    text-shadow: 4px 0 #00D4FF, -4px 0 #FF003C;
+    transform: translate(3px, 0) skewX(2deg);
+  }
+  96% {
+    text-shadow: -2px 0 #00FF41, 2px 0 #FF003C;
+    transform: translate(-1px, 0);
+  }
+  98% {
+    transform: translate(2px, 0);
+  }
+}
+
+/* NEON FLICKER */
+@keyframes flicker {
+  0%, 95%, 100% { opacity: 1; }
+  96% { opacity: 0.4; }
+  97% { opacity: 1; }
+  98% { opacity: 0.2; }
+  99% { opacity: 0.9; }
+}
+
+/* FLOAT (auth card) */
+@keyframes float {
+  0%, 100% { transform: translateY(-8px) rotateX(0.5deg); }
+  50%       { transform: translateY(8px) rotateX(-0.5deg); }
+}
+
+/* BLINK CURSOR */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+.cursor-blink { animation: blink 1s step-end infinite; }
+
+/* CARD GLOW PULSE */
+@keyframes glowPulse {
+  0%, 100% { box-shadow: var(--glow-xs); }
+  50%       { box-shadow: var(--glow-sm); }
+}
+
+/* PROGRESS BAR FILL */
+@keyframes fillBar {
+  from { width: 0%; }
+  to   { width: var(--fill); }
+}
+
+/* BOOT LINE APPEAR */
+@keyframes bootLine {
+  from { opacity: 0; transform: translateX(-8px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* CARD EXIT (wishlist remove) */
+@keyframes cardExit {
+  0%   { transform: translateX(0) scaleY(1); opacity: 1; max-height: 400px; }
+  50%  { transform: translateX(20px) scaleY(0.8); opacity: 0.4; }
+  100% { transform: translateX(40px) scaleY(0); opacity: 0;
+         max-height: 0; margin: 0; padding: 0; }
+}
+
+/* COUNT UP DONE FLASH */
+@keyframes countFlash {
+  0%, 100% { color: var(--white); }
+  50%       { color: var(--green); text-shadow: var(--glow-sm); }
+}
+
+/* TOAST ENTER */
+@keyframes toastEnter {
+  from { opacity: 0; transform: translateX(60px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* SPIN (cube faces) */
+@keyframes cubeRotate {
+  from { transform: rotateX(-30deg) rotateY(0deg); }
+  to   { transform: rotateX(-30deg) rotateY(360deg); }
+}
+
+/* SLIDE IN FROM LEFT */
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-30px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* PULSE RING */
+@keyframes pulseRing {
+  0%   { transform: scale(0.9); opacity: 1; }
+  100% { transform: scale(1.5); opacity: 0; }
+}

@@ -1,0 +1,5 @@
+connectorId: "watch"
+generate:
+  javascriptSdk:
+    outputDir: "../../src/generated-sdk"
+    package: "@voidstream/sdk"

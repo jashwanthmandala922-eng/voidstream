@@ -1,0 +1,273 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;900&family=Inter:wght@400;500;600;700&family=Montserrat:wght@700;800;900&display=swap');
+
+/* ── THEME & LAYOUT TOKENS ─────────────────────────────────────── */
+:root {
+  /* Default (Hotstar-inspired) */
+  --black:       #0f1014;
+  --secondary:   #1a1c22;
+  --card-bg:     #1a1c22;
+  --white:       #f9f9f9;
+  --dim:         #8f98b2;
+  
+  --primary:     #1492FF;    /* Hotstar Blue */
+  --accent:      #1492FF;
+  
+  --red:         #ff3d00;
+  --gray:        #8f98b2;
+
+  --border:      rgba(255, 255, 255, 0.08);
+  --glass-bg:    rgba(15, 16, 20, 0.75);
+  --glass-border:rgba(255, 255, 255, 0.1);
+
+  --glow-xs:     0 0 10px rgba(20, 146, 255, 0.2);
+  --glow-sm:     0 0 15px rgba(20, 146, 255, 0.4);
+  --glow-md:     0 0 25px rgba(20, 146, 255, 0.6);
+  --glow-lg:     0 0 35px rgba(20, 146, 255, 0.8);
+  
+  --shadow-sm:   0 4px 20px rgba(0, 0, 0, 0.5);
+  --shadow-md:   0 12px 48px rgba(0, 0, 0, 0.7);
+  --shadow-lg:   0 24px 80px rgba(0, 0, 0, 0.9);
+
+  --page-x:      clamp(20px, 5vw, 60px);
+  --nav-w:       96px;       /* Sidebar width */
+  --nav-h:       80px;       /* Navbar height */
+  --card-w:      clamp(160px, 16vw, 240px);
+  --radius:      8px;        /* Hotstar rounded */
+}
+
+/* ── THEME OVERRIDES ── */
+[data-theme='cineby'] {
+  --black:       #000000;
+  --secondary:   #080808;
+  --card-bg:     #121212;
+  --primary:     #FFFFFF;
+  --accent:      #FF0000;    /* Cineby Red */
+  --glow-xs:     0 0 10px rgba(255, 0, 0, 0.15);
+  --glow-sm:     0 0 15px rgba(255, 0, 0, 0.3);
+  --glow-md:     0 0 25px rgba(255, 0, 0, 0.45);
+  --glow-lg:     0 0 35px rgba(255, 0, 0, 0.6);
+  --radius:      2px;        /* Cineby sharp */
+}
+
+[data-theme='hotstar'] {
+  --black:       #0f1014;
+  --primary:     #1492FF;
+  --accent:      #1492FF;
+  --radius:      8px;
+}
+
+/* ── NAVIGATION LAYOUT OVERRIDES ── */
+[data-nav='sidebar'] {
+  --page-left:   var(--nav-w);
+  --page-top:    20px;
+}
+
+[data-nav='navbar'] {
+  --page-left:   0px;
+  --page-top:    var(--nav-h);
+}
+
+/* ── RESET ─────────────────────────────────────────────────────── */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  transition: background-color 0.4s var(--ease-in-out), border-color 0.4s var(--ease-in-out), color 0.4s var(--ease-in-out), box-shadow 0.4s var(--ease-in-out);
+}
+
+:root {
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out:    cubic-bezier(0, 0, 0.2, 1);
+}
+
+a, button, select, input {
+  transition: all 0.3s var(--ease-out);
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--black);
+  color: var(--white);
+  font-family: 'Inter', sans-serif;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Glassmorphism panel utility */
+.glass-panel {
+  background: var(--glass-bg);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--glass-border);
+}
+
+/* ── VIGNETTE OVERLAY ──────────────────────────────────────────── */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 65%,
+    rgba(0,0,0,0.4) 100%
+  );
+  pointer-events: none;
+  z-index: 9997;
+  will-change: auto;
+  contain: layout style paint;
+}
+
+/* ── CINEBY UTILITIES ──────── */
+.outline-text {
+  color: transparent;
+  -webkit-text-stroke: 2px var(--accent);
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.letter-spaced {
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--dim);
+}
+
+.clip-md {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* ── SCROLLBAR ─────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: var(--black); }
+::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.1);
+  border-radius: 10px;
+  transition: background 0.3s;
+}
+::-webkit-scrollbar-thumb:hover, 
+::-webkit-scrollbar-thumb:active { background: var(--accent); }
+
+/* ── PAGE TRANSITION ───────────────────────────────────────────── */
+.page-enter {
+  animation: pageEnter 0.35s ease forwards;
+}
+@keyframes pageEnter {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── CARD HOVER ────────────────────────────────────────────────── */
+.clip-md:hover .card-play-overlay {
+  opacity: 1 !important;
+  background: radial-gradient(circle, transparent 40%, rgba(0,0,0,0.6) 100%) !important;
+  backdrop-filter: blur(2px);
+}
+
+/* ── RESPONSIVE NAVBAR HELPERS ─────────────────────────────────── */
+.nav-links-desktop { display: flex; }
+.nav-hamburger     { display: none; }
+
+@media (max-width: 768px) {
+  :root { --page-x: 4vw; }
+  .nav-links-desktop { display: none !important; }
+  .nav-hamburger     { display: flex !important; }
+  * { cursor: auto; }          /* restore native cursor on touch */
+}
+
+@media (min-width: 1920px) {
+  :root {
+    --page-x: 8vw;
+    --card-w: clamp(200px, 14vw, 280px);
+    --nav-h:  70px;
+  }
+}
+
+/* ── EXPANDED Z-INDEX FIX ───────────────────────────────────────── */
+.scroll-row {
+  overflow: visible !important;
+  z-index: 1;
+  position: relative;
+}
+
+/* Ensure the hovered card always beats the navigation arrows */
+.scroll-row div:hover,
+.scroll-row .content-card-root:hover,
+.scroll-row :has(.brand-card:hover) {
+  z-index: 2000 !important;
+}
+
+/* But arrows should normally stay above cards */
+.scroll-row + button,
+section > div > button {
+  z-index: 1000;
+}
+
+/* ── REDUCED MOTION ────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ── TOUCH SCROLL ROWS ─────────────────────────────────────────── */
+.scroll-row {
+  display: flex;
+  gap: clamp(10px, 2vw, 20px);
+  overflow-x: auto;
+  overflow-y: visible;
+  padding: 40px 0;
+  scroll-behavior: smooth;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  scroll-snap-type: x proximity;
+  position: relative;
+  z-index: 1;
+}
+
+/* Ensure the container pops above sibling elements like sticky headers if they exist */
+.scroll-row:has(*:hover) {
+  z-index: 500;
+}
+
+.scroll-row::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
+}
+
+.scroll-row > * {
+  scroll-snap-align: start;
+  flex-shrink: 0;
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), width 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
+}
+
+/* ── INTERACTIVE EXPANSION SYSTEM ── */
+.scroll-row:has(.content-card-root.hovered) .content-card-root:not(.hovered) {
+  opacity: 0.8;
+  filter: brightness(0.8) grayscale(0.2);
+  transform: scale(0.98);
+}
+
+.scroll-row:has(.content-card-root.expanded) .content-card-root:not(.expanded) {
+  opacity: 0.7;
+  filter: brightness(0.6) blur(2px);
+  transform: scale(0.95);
+}
+
+.content-card-root {
+  transform-origin: center center;
+  transition: 
+    width 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.5s ease,
+    filter 0.5s ease;
+}
+
+.content-card-root.expanded {
+  z-index: 500 !important;
+}
