@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE = 'http://localhost:5000/api/tmdb';
+const BASE = '/api/tmdb';
 const IMG  = 'https://image.tmdb.org/t/p';
 
 // Build full image URL — returns placeholder if no path

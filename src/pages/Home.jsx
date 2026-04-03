@@ -475,9 +475,6 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [history, setHistory] = useState([]);
 
-  const mainPaddingLeft = !isAuthPage && settings.navStyle === 'sidebar' ? 'calc(var(--nav-w) + 120px)' : '0';
-  const mainPaddingTop  = !isAuthPage && settings.navStyle === 'navbar'  ? 'var(--page-top)'  : '0';
-
   useEffect(() => {
     getHistory().then(setHistory).catch(e => console.error(e));
 
