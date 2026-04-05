@@ -160,15 +160,9 @@ export default function Detail({ type }) {
               {trailerVideo && (
                 <button 
                   className="detail-btn-secondary"
-                  onClick={() => {
-                    if (isMobileDevice()) {
-                      setShowTrailerModal(true);
-                    } else {
-                      setShowInlineTrailer(p => !p);
-                    }
-                  }}
+                  onClick={() => setShowInlineTrailer(p => !p)}
                 >
-                  {isMobileDevice() ? <><ExternalLink size={14} strokeWidth={2} /> Trailer</> : (showInlineTrailer ? 'Hide Trailer' : 'Trailer')}
+                  {showInlineTrailer ? 'Hide Trailer' : 'Trailer'}
                 </button>
               )}
               <button className="detail-btn-secondary" onClick={handleWishlist}>
