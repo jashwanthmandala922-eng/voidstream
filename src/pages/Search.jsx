@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { searchAll, img } from '../services/tmdbService';
+import MobileSearch from './MobileSearch';
+import { useIsMobile } from '../hooks/useResponsive';
 
 function SearchListItem({ item }) {
   const navigate = useNavigate();
@@ -65,9 +67,10 @@ export default function Search() {
   const [totalPgs, setTotalPgs] = useState(1);
   const navigate = useNavigate();
   const searchQ = searchParams.get('q') || '';
+  const isMobile = useIsMobile();
 
   const fetchData = useCallback(async () => {
-    if (!searchQ) {
+    if (isMobile || !searchQ) {
       setItems([]);
       setLoading(false);
       return;
@@ -85,7 +88,11 @@ export default function Search() {
   }, [page, searchQ]);
 
   useEffect(() => { setPage(1); }, [searchQ]);
-  useEffect(() => { fetchData(); }, [fetchData]);
+  useEffect(() => { fetchData(); }, [fetchData, isMobile]);
+
+  if (isMobile) {
+    return <MobileSearch />;
+  }
 
   return (
     <div style={{ minHeight: '100vh', padding: 'calc(var(--nav-h, 60px) + 64px) var(--page-x, 5vw) 120px' }}>

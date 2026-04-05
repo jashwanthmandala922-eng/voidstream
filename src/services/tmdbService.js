@@ -28,15 +28,37 @@ api.interceptors.response.use(
   }
 );
 
-const get = (endpoint, params = {}) =>
-  api.get(endpoint, { params }) // No API key passed here!
-     .then(r => r.data);
+// In-memory cache with 5-minute TTL
+const cache = new Map();
+const CACHE_TTL = 5 * 60 * 1000;
+
+const get = (endpoint, params = {}) => {
+  const key = endpoint + JSON.stringify(params);
+  const cached = cache.get(key);
+  if (cached && Date.now() - cached.time < CACHE_TTL) {
+    return Promise.resolve(cached.data);
+  }
+  return api.get(endpoint, { params })
+    .then(r => {
+      cache.set(key, { data: r.data, time: Date.now() });
+      return r.data;
+    });
+};
+
+// Periodic cache pruning (every hour)
+setInterval(() => {
+  const now = Date.now();
+  for (const [key, cached] of cache.entries()) {
+    if (now - cached.time > CACHE_TTL) cache.delete(key);
+  }
+}, 3600000); // 1 hour
 
 
 // HOME ROWS
 export const getTrending   = () => get('trending/all/week');
 export const getPopMovies  = () => get('movie/popular');
 export const getPopSeries  = () => get('tv/popular');
+export const getOnTheAir   = () => get('tv/on_the_air');
 export const getNowPlaying = () => get('movie/now_playing');
 export const getTopRated   = () => get('movie/top_rated');
 export const getTopRatedTV = () => get('tv/top_rated');

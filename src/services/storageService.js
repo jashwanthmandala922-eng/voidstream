@@ -1,6 +1,14 @@
 import { executeQuery, executeMutation, getDataConnect } from 'firebase/data-connect';
 import app, { auth } from '../config/firebase';
 
+const KEYS = {
+  SETTINGS: 'voidstream_settings',
+  GUEST:    'voidstream_guest',
+  USERNAME: 'voidstream_username',
+  WISHLIST: 'voidstream_wishlist',
+  HISTORY:  'voidstream_history'
+};
+
 /**
  * Robust Singleton for Firebase Data Connect.
  */
@@ -16,21 +24,12 @@ const getDC = () => {
     return dc;
 };
 
-// Legacy compatibility for older components
-export const setGuestMode = (v) => localStorage.setItem(KEYS.GUEST, v);
+export const setGuestMode = (v = 'true') => localStorage.setItem(KEYS.GUEST, v);
 export const exitGuestMode = () => {
     localStorage.removeItem(KEYS.GUEST);
     localStorage.removeItem(KEYS.WISHLIST);
     localStorage.removeItem(KEYS.HISTORY);
     window.location.reload();
-};
-
-const KEYS = {
-  SETTINGS: 'voidstream_settings',
-  GUEST:    'voidstream_guest',
-  USERNAME: 'voidstream_username',
-  WISHLIST: 'voidstream_wishlist',
-  HISTORY:  'voidstream_history'
 };
 
 // ── UTILS ──────────────────────────────────────────────
@@ -59,7 +58,7 @@ export const getWishlist = async () => {
       return JSON.parse(localStorage.getItem('voidstream_wishlist') || '[]');
     } catch { return []; }
   }
-  if (!auth.currentUser) return [];
+  if (!auth || !auth.currentUser) return [];
   try {
     const instance = getDC();
     const { data } = await executeQuery(instance, 'GetWishlist');
@@ -89,7 +88,7 @@ export const addToWishlist = async (item) => {
     }
     return true;
   }
-  if (!auth.currentUser) return false;
+  if (!auth || !auth.currentUser) return false;
   try {
     const instance = getDC();
     await executeMutation(instance, 'AddToWishlist', {
@@ -113,7 +112,7 @@ export const removeFromWishlist = async (id, type) => {
     localStorage.setItem('voidstream_wishlist', JSON.stringify(list.filter(i => String(i.id) !== String(id))));
     return;
   }
-  if (!auth.currentUser) return;
+  if (!auth || !auth.currentUser) return;
   try {
     const instance = getDC();
     const vars = {
@@ -137,7 +136,7 @@ export const clearWishlist = async () => {
     localStorage.removeItem(KEYS.WISHLIST);
     return;
   }
-  if (!auth.currentUser) return;
+  if (!auth || !auth.currentUser) return;
   try {
     const instance = getDC();
     await executeMutation(instance, 'ClearWishlist');
@@ -153,7 +152,7 @@ export const getHistory = async () => {
       return JSON.parse(localStorage.getItem('voidstream_history') || '[]');
     } catch { return []; }
   }
-  if (!auth.currentUser) return [];
+  if (!auth || !auth.currentUser) return [];
   try {
     const instance = getDC();
     const { data } = await executeQuery(instance, 'GetHistory');
@@ -184,7 +183,7 @@ export const addToHistory = async (item) => {
     localStorage.setItem('voidstream_history', JSON.stringify(hist.slice(0, 20)));
     return;
   }
-  if (!auth.currentUser) return;
+  if (!auth || !auth.currentUser) return;
   try {
     const instance = getDC();
     await executeMutation(instance, 'AddToHistory', {
@@ -206,7 +205,7 @@ export const removeFromHistory = async (id, type) => {
     localStorage.setItem('voidstream_history', JSON.stringify(hist.filter(i => String(i.id) !== String(id))));
     return;
   }
-  if (!auth.currentUser) return;
+  if (!auth || !auth.currentUser) return;
   try {
     const instance = getDC();
     await executeMutation(instance, 'RemoveFromHistory', {
@@ -224,7 +223,7 @@ export const clearHistory = async () => {
     localStorage.removeItem('voidstream_history');
     return;
   }
-  if (!auth.currentUser) return;
+  if (!auth || !auth.currentUser) return;
   try {
     const instance = getDC();
     await executeMutation(instance, 'ClearHistory');
@@ -241,7 +240,10 @@ export const getStorageSize = () => {
       size += (localStorage[key].length + key.length) * 2;
     }
   }
-  return (size / 1024 / 1024).toFixed(2); // MB
+  const kb = (size / 1024).toFixed(2);
+  const mb = (size / 1024 / 1024).toFixed(2);
+  const percent = Math.min(((size / 1024) / 5120) * 100, 100).toFixed(1);
+  return { kb, mb, percent };
 };
 
 export const exportHistory = async () => {
@@ -264,20 +266,22 @@ export const exportWishlist = async () => {
   a.click();
 };
 
-export const importData = async (file) => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = async (e) => {
-      try {
-        const data = JSON.parse(e.target.result);
-        // Basic validation
-        if (Array.isArray(data)) {
-          resolve(data);
-        } else {
-          reject('Invalid format');
-        }
-      } catch { reject('Import failed'); }
-    };
-    reader.readAsText(file);
-  });
+/**
+ * Parses and validates imported data. Accepts a File, JSON string, or already-parsed object.
+ * Returns the validated array. Callers are responsible for persisting the items.
+ */
+export const importData = async (data) => {
+  let text;
+  if (data instanceof File) {
+    text = await data.text();
+  } else if (typeof data === 'string') {
+    text = data;
+  } else {
+    text = JSON.stringify(data);
+  }
+  const parsed = JSON.parse(text);
+  if (!Array.isArray(parsed)) {
+    throw new Error('Invalid format: expected an array of items');
+  }
+  return parsed;
 };

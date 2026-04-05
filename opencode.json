@@ -1,0 +1,47 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "playwright": {
+      "type": "local",
+      "command": ["npx", "-y", "@playwright/mcp@latest"],
+      "enabled": true
+    },
+    "context7": {
+      "type": "remote",
+      "url": "https://mcp.context7.com/mcp",
+      "enabled": true
+    },
+    "brave-search": {
+      "type": "local",
+      "command": ["npx", "-y", "@anthropic-ai/brave-search-mcp@latest"],
+      "environment": {
+        "BRAVE_API_KEY": "{env:BRAVE_API_KEY}"
+      },
+      "enabled": true
+    },
+    "firecrawl": {
+      "type": "local",
+      "command": ["npx", "-y", "@mendable/firecrawl-mcp@latest"],
+      "environment": {
+        "FIRECRAWL_API_KEY": "{env:FIRECRAWL_API_KEY}"
+      },
+      "enabled": true
+    },
+    "vercel": {
+      "type": "remote",
+      "url": "https://mcp.vercel.com",
+      "headers": {
+        "Authorization": "Bearer {env:VERCEL_API_TOKEN}"
+      },
+      "enabled": true
+    },
+    "e2b": {
+      "type": "local",
+      "command": ["npx", "-y", "@e2b/mcp@latest"],
+      "environment": {
+        "E2B_API_KEY": "{env:E2B_API_KEY}"
+      },
+      "enabled": true
+    }
+  }
+}

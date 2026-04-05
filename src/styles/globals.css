@@ -1,78 +1,84 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;900&family=Inter:wght@400;500;600;700&family=Montserrat:wght@700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700&display=swap');
 
-/* ── THEME & LAYOUT TOKENS ─────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════
+   PREMIUM CINEMATIC THEME — Deep Onyx
+   Background: #0a0a0a  |  Accent: #007AFF
+   Typography: Inter (Light/Medium)  |  Radius: 16px
+   ═══════════════════════════════════════════════════════════ */
+
 :root {
-  /* Default (Hotstar-inspired) */
-  --black:       #0f1014;
-  --secondary:   #1a1c22;
-  --card-bg:     #1a1c22;
-  --white:       #f9f9f9;
-  --dim:         #8f98b2;
-  
-  --primary:     #1492FF;    /* Hotstar Blue */
-  --accent:      #1492FF;
-  
+  --black:       #0a0a0a;
+  --secondary:   #111111;
+  --card-bg:     #141414;
+  --white:       #f5f5f7;
+  --dim:         #86868b;
+
+  --primary:     #007AFF;
+  --accent:      #007AFF;
+  --violet:      #007AFF;
+  --navy:        #0a0a0a;
+  --deep-navy:   #050505;
+
   --red:         #ff3d00;
-  --gray:        #8f98b2;
+  --gray:        #86868b;
 
-  --border:      rgba(255, 255, 255, 0.08);
-  --glass-bg:    rgba(15, 16, 20, 0.75);
-  --glass-border:rgba(255, 255, 255, 0.1);
+  --border:      rgba(255, 255, 255, 0.06);
+  --glass-bg:    rgba(10, 10, 10, 0.72);
+  --glass-border:rgba(255, 255, 255, 0.08);
 
-  --glow-xs:     0 0 10px rgba(20, 146, 255, 0.2);
-  --glow-sm:     0 0 15px rgba(20, 146, 255, 0.4);
-  --glow-md:     0 0 25px rgba(20, 146, 255, 0.6);
-  --glow-lg:     0 0 35px rgba(20, 146, 255, 0.8);
+  --glow-xs:     0 0 10px rgba(0, 122, 255, 0.15);
+  --glow-sm:     0 0 15px rgba(0, 122, 255, 0.25);
+  --glow-md:     0 0 25px rgba(0, 122, 255, 0.4);
+  --glow-lg:     0 0 35px rgba(0, 122, 255, 0.6);
+
+  --shadow-sm:   0 4px 20px rgba(0, 0, 0, 0.4);
+  --shadow-md:   0 12px 48px rgba(0, 0, 0, 0.6);
+  --shadow-lg:   0 24px 80px rgba(0, 0, 0, 0.8);
+
+  --page-x:      clamp(24px, 4vw, 48px);
+  --nav-w:       0px;        /* No sidebar */
+  --nav-h:       64px;
+  --card-w:      clamp(150px, 14vw, 220px);
+  --radius:      16px;
+  --radius-sm:   10px;
+  --radius-lg:   20px;
   
-  --shadow-sm:   0 4px 20px rgba(0, 0, 0, 0.5);
-  --shadow-md:   0 12px 48px rgba(0, 0, 0, 0.7);
-  --shadow-lg:   0 24px 80px rgba(0, 0, 0, 0.9);
-
-  --page-x:      clamp(20px, 5vw, 60px);
-  --nav-w:       96px;       /* Sidebar width */
-  --nav-h:       80px;       /* Navbar height */
-  --card-w:      clamp(160px, 16vw, 240px);
-  --radius:      8px;        /* Hotstar rounded */
+  --header-overlap: -34px;
 }
 
-/* ── THEME OVERRIDES ── */
 [data-theme='cineby'] {
-  --black:       #000000;
-  --secondary:   #080808;
-  --card-bg:     #121212;
-  --primary:     #FFFFFF;
-  --accent:      #FF0000;    /* Cineby Red */
-  --glow-xs:     0 0 10px rgba(255, 0, 0, 0.15);
-  --glow-sm:     0 0 15px rgba(255, 0, 0, 0.3);
-  --glow-md:     0 0 25px rgba(255, 0, 0, 0.45);
-  --glow-lg:     0 0 35px rgba(255, 0, 0, 0.6);
-  --radius:      2px;        /* Cineby sharp */
+  --black:       #0a0a0a;
+  --secondary:   #111111;
+  --card-bg:     #141414;
+  --primary:     #007AFF;
+  --accent:      #007AFF;
+  --radius:      16px;
 }
 
 [data-theme='hotstar'] {
-  --black:       #0f1014;
-  --primary:     #1492FF;
-  --accent:      #1492FF;
-  --radius:      8px;
+  --black:       #0a0a0a;
+  --primary:     #007AFF;
+  --accent:      #007AFF;
+  --radius:      16px;
 }
 
-/* ── NAVIGATION LAYOUT OVERRIDES ── */
+/* ── NAVIGATION LAYOUT ── */
 [data-nav='sidebar'] {
-  --page-left:   var(--nav-w);
-  --page-top:    20px;
+  --page-left:   0px;
+  --page-top:    64px;
 }
 
 [data-nav='navbar'] {
   --page-left:   0px;
-  --page-top:    var(--nav-h);
+  --page-top:    64px;
 }
 
-/* ── RESET ─────────────────────────────────────────────────────── */
+/* ── RESET ── */
 *, *::before, *::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  transition: background-color 0.4s var(--ease-in-out), border-color 0.4s var(--ease-in-out), color 0.4s var(--ease-in-out), box-shadow 0.4s var(--ease-in-out);
+  -webkit-tap-highlight-color: transparent;
 }
 
 :root {
@@ -81,7 +87,7 @@
 }
 
 a, button, select, input {
-  transition: all 0.3s var(--ease-out);
+  transition: all 0.35s var(--ease-out);
 }
 
 html { scroll-behavior: smooth; }
@@ -89,185 +95,158 @@ html { scroll-behavior: smooth; }
 body {
   background: var(--black);
   color: var(--white);
-  font-family: 'Inter', sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  letter-spacing: -0.01em;
 }
 
-/* Glassmorphism panel utility */
+/* Glassmorphism utility */
 .glass-panel {
   background: var(--glass-bg);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
+  backdrop-filter: blur(40px) saturate(180%);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
   border: 1px solid var(--glass-border);
 }
 
-/* ── VIGNETTE OVERLAY ──────────────────────────────────────────── */
-body::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background: radial-gradient(
-    ellipse at center,
-    transparent 65%,
-    rgba(0,0,0,0.4) 100%
-  );
-  pointer-events: none;
-  z-index: 9997;
-  will-change: auto;
-  contain: layout style paint;
-}
-
-/* ── CINEBY UTILITIES ──────── */
-.outline-text {
-  color: transparent;
-  -webkit-text-stroke: 2px var(--accent);
-  font-family: 'Montserrat', sans-serif;
-  font-weight: 900;
-  line-height: 1;
-}
-
-.letter-spaced {
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-  font-size: 11px;
-  font-weight: 800;
-  color: var(--dim);
-}
-
-.clip-md {
-  border-radius: 12px;
-  overflow: hidden;
-}
-
-/* ── SCROLLBAR ─────────────────────────────────────────────────── */
-::-webkit-scrollbar { width: 4px; height: 4px; }
-::-webkit-scrollbar-track { background: var(--black); }
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 3px; height: 3px; }
+::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
-  background: rgba(255,255,255,0.1);
+  background: rgba(255, 255, 255, 0.08);
   border-radius: 10px;
-  transition: background 0.3s;
 }
-::-webkit-scrollbar-thumb:hover, 
-::-webkit-scrollbar-thumb:active { background: var(--accent); }
+::-webkit-scrollbar-thumb:hover { background: rgba(0, 122, 255, 0.4); }
 
-/* ── PAGE TRANSITION ───────────────────────────────────────────── */
+/* ── PAGE TRANSITION ── */
 .page-enter {
-  animation: pageEnter 0.35s ease forwards;
+  animation: pageEnter 0.5s cubic-bezier(0, 0, 0.2, 1) forwards;
 }
 @keyframes pageEnter {
-  from { opacity: 0; transform: translateY(12px); }
+  from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ── CARD HOVER ────────────────────────────────────────────────── */
-.clip-md:hover .card-play-overlay {
-  opacity: 1 !important;
-  background: radial-gradient(circle, transparent 40%, rgba(0,0,0,0.6) 100%) !important;
-  backdrop-filter: blur(2px);
+/* ── SHIMMER ── */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
 }
 
-/* ── RESPONSIVE NAVBAR HELPERS ─────────────────────────────────── */
-.nav-links-desktop { display: flex; }
-.nav-hamburger     { display: none; }
+/* ── SCROLL ROWS ── */
+.scroll-row {
+  display: flex;
+  gap: clamp(16px, 3vw, 28px);
+  overflow-x: auto;
+  overflow-y: hidden; /* Fallback for clip */
+  overflow-y: clip;
+  padding: 50px 0 20px;
+  margin-top: var(--header-overlap);
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  position: relative;
+  z-index: 1;
+}
 
+.scroll-row::-webkit-scrollbar { display: none; }
+
+.scroll-row > * {
+  flex-shrink: 0;
+  transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.45s ease;
+}
+
+/* ── CARD BASE ── */
+.content-card-root {
+  transform-origin: center center;
+  transition:
+    transform 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.45s ease;
+}
+
+.content-card-root:hover {
+  transform: scale(1.05);
+}
+
+.content-card-root.expanded {
+  z-index: 500 !important;
+}
+
+/* ── RESPONSIVE ── */
 @media (max-width: 768px) {
-  :root { --page-x: 4vw; }
+  .sidebar-root { display: none !important; }
+  .nav-hamburger { display: none !important; }
   .nav-links-desktop { display: none !important; }
-  .nav-hamburger     { display: flex !important; }
-  * { cursor: auto; }          /* restore native cursor on touch */
+  .nav-links-mobile { display: flex !important; }
+
+  :root { --page-x: 16px; }
+
+  body {
+    padding-top: 56px;
+    padding-bottom: 64px;
+  }
+
+  .scroll-row {
+    gap: 10px;
+    padding: 8px 0;
+    overflow-y: hidden;
+    overflow-x: auto;
+    overscroll-behavior-x: none;
+  }
+
+  .scroll-row > * {
+    transition: none;
+  }
+
+  /* Collapse the invisible hover wrapper to card size on mobile */
+  .premium-card-slot {
+    overflow: hidden;
+  }
+
+  .premium-card-hover {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    transform: none !important;
+    width: 100% !important;
+    height: 100% !important;
+  }
+
+  .premium-card-poster {
+    position: relative !important;
+    bottom: auto !important;
+    left: auto !important;
+    transform: none !important;
+    width: 100% !important;
+    height: 100% !important;
+  }
+
+  .premium-card-overlay {
+    display: none !important;
+  }
+
+  .content-card-root:hover {
+    transform: none;
+  }
+
+  /* Targeted cursor for mobile */
+  .content-card-root, .scroll-row > *, body { cursor: default; }
+  button, a, [role="button"], [role="link"], select, input, .clickable { cursor: pointer; }
 }
 
 @media (min-width: 1920px) {
   :root {
-    --page-x: 8vw;
-    --card-w: clamp(200px, 14vw, 280px);
-    --nav-h:  70px;
+    --page-x: 6vw;
+    --card-w: clamp(180px, 13vw, 260px);
   }
 }
 
-/* ── EXPANDED Z-INDEX FIX ───────────────────────────────────────── */
-.scroll-row {
-  overflow: visible !important;
-  z-index: 1;
-  position: relative;
-}
-
-/* Ensure the hovered card always beats the navigation arrows */
-.scroll-row div:hover,
-.scroll-row .content-card-root:hover,
-.scroll-row :has(.brand-card:hover) {
-  z-index: 2000 !important;
-}
-
-/* But arrows should normally stay above cards */
-.scroll-row + button,
-section > div > button {
-  z-index: 1000;
-}
-
-/* ── REDUCED MOTION ────────────────────────────────────────────── */
+/* ── REDUCED MOTION ── */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
-}
-
-/* ── TOUCH SCROLL ROWS ─────────────────────────────────────────── */
-.scroll-row {
-  display: flex;
-  gap: clamp(10px, 2vw, 20px);
-  overflow-x: auto;
-  overflow-y: visible;
-  padding: 40px 0;
-  scroll-behavior: smooth;
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-  scroll-snap-type: x proximity;
-  position: relative;
-  z-index: 1;
-}
-
-/* Ensure the container pops above sibling elements like sticky headers if they exist */
-.scroll-row:has(*:hover) {
-  z-index: 500;
-}
-
-.scroll-row::-webkit-scrollbar {
-  display: none; /* Chrome, Safari and Opera */
-}
-
-.scroll-row > * {
-  scroll-snap-align: start;
-  flex-shrink: 0;
-  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), width 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
-}
-
-/* ── INTERACTIVE EXPANSION SYSTEM ── */
-.scroll-row:has(.content-card-root.hovered) .content-card-root:not(.hovered) {
-  opacity: 0.8;
-  filter: brightness(0.8) grayscale(0.2);
-  transform: scale(0.98);
-}
-
-.scroll-row:has(.content-card-root.expanded) .content-card-root:not(.expanded) {
-  opacity: 0.7;
-  filter: brightness(0.6) blur(2px);
-  transform: scale(0.95);
-}
-
-.content-card-root {
-  transform-origin: center center;
-  transition: 
-    width 0.5s cubic-bezier(0.4, 0, 0.2, 1),
-    transform 0.5s cubic-bezier(0.4, 0, 0.2, 1),
-    opacity 0.5s ease,
-    filter 0.5s ease;
-}
-
-.content-card-root.expanded {
-  z-index: 500 !important;
 }
