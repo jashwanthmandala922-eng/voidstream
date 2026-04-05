@@ -25,39 +25,41 @@ function CSSBackground() {
       background: 'radial-gradient(ellipse at 20% 50%, rgba(0,255,65,0.04) 0%, transparent 60%), radial-gradient(ellipse at 80% 20%, rgba(0,212,255,0.03) 0%, transparent 50%)',
       overflow: 'hidden',
     }}>
-      {/* Animated grid lines */}
+      {/* Animated grid lines using transform for performance */}
       <div style={{
-        position: 'absolute', inset: 0,
+        position: 'absolute', top: '-100px', left: '-100px', width: 'calc(100% + 200px)', height: 'calc(100% + 200px)',
         backgroundImage: `
           linear-gradient(rgba(0,255,65,0.04) 1px, transparent 1px),
           linear-gradient(90deg, rgba(0,255,65,0.04) 1px, transparent 1px)
         `,
         backgroundSize: '60px 60px',
-        animation: 'cssBgScroll 20s linear infinite',
+        animation: 'cssBgScroll 25s linear infinite',
+        willChange: 'transform',
       }} />
-      {/* Drifting dots */}
-      {[...Array(12)].map((_, i) => (
+      {/* Drifting dots - reduced count for mobile performance */}
+      {[...Array(6)].map((_, i) => (
         <div key={i} style={{
           position: 'absolute',
-          width:  `${2 + (i % 3)}px`,
-          height: `${2 + (i % 3)}px`,
-          background: i % 3 === 0 ? 'var(--green)' : i % 3 === 1 ? 'var(--cyan)' : 'var(--dim)',
+          width:  `${2 + (i % 2)}px`,
+          height: `${2 + (i % 2)}px`,
+          background: i % 2 === 0 ? 'var(--green, #00FF41)' : 'var(--cyan, #00D2FF)',
           borderRadius: '50%',
-          left:   `${(i * 8.3) % 100}%`,
-          top:    `${(i * 13.7) % 100}%`,
-          opacity: 0.3 + (i % 4) * 0.1,
-          animation: `cssDrift ${8 + (i % 6) * 2}s ease-in-out infinite alternate`,
-          animationDelay: `${i * 0.7}s`,
+          left:   `${(i * 16.6) % 100}%`,
+          top:    `${(i * 21.7) % 100}%`,
+          opacity: 0.2 + (i % 3) * 0.1,
+          animation: `cssDrift ${10 + (i % 4) * 3}s ease-in-out infinite alternate`,
+          animationDelay: `${i * 0.8}s`,
+          willChange: 'transform',
         }} />
       ))}
       <style>{`
         @keyframes cssBgScroll {
-          0%   { background-position: 0 0, 0 0; }
-          100% { background-position: 0 60px, 60px 0; }
+          0%   { transform: translate(0, 0); }
+          100% { transform: translate(60px, 60px); }
         }
         @keyframes cssDrift {
-          from { transform: translate(0, 0) scale(1); }
-          to   { transform: translate(${Math.random() > 0.5 ? '+' : '-'}20px, -30px) scale(1.5); }
+          from { transform: translate(0, 0); }
+          to   { transform: translate(${Math.random() > 0.5 ? '+' : '-'}15px, -20px); }
         }
       `}</style>
     </div>

@@ -183,6 +183,19 @@ export default function Navbar() {
           border-bottom: 1px solid rgba(255, 255, 255, 0.04);
         }
 
+        @media (max-width: 768px) {
+          .premium-navbar {
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            background: rgba(10, 10, 10, 0.6);
+          }
+          .premium-navbar.scrolled {
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            background: rgba(10, 10, 10, 0.85);
+          }
+        }
+
         .premium-navbar.hidden {
           transform: translateY(-100%);
         }

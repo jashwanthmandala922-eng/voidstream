@@ -313,6 +313,15 @@ const ContentCard = memo(function ContentCard({ item, size = 'normal' }) {
           border: 1px solid rgba(255, 255, 255, 0.06);
         }
 
+        @media (max-width: 768px) {
+          .premium-card-type, .premium-card-rating {
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+          }
+          .premium-card-type { background: rgba(0, 122, 255, 0.9); }
+          .premium-card-rating { background: rgba(0, 0, 0, 0.85); }
+        }
+
         .premium-card-rating svg { color: #FFB400; }
 
         .premium-card-info {
