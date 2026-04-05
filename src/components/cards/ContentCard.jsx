@@ -1,4 +1,4 @@
-import { memo, useRef, useCallback, useState, useEffect } from 'react';
+import { memo, useRef, useCallback, useMemo, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { img, getVideos } from '../../services/tmdbService';
 import { isWishlisted, addToWishlist, removeFromWishlist, getSettings } from '../../services/storageService';
@@ -40,8 +40,8 @@ const ContentCard = memo(function ContentCard({ item, size = 'normal' }) {
   const route = type === 'movie' ? '/movie' : type === 'anime' ? '/anime' : '/series';
   const isMobile = isMobileDevice();
 
-  // Throttled tilt handler to prevent layout thrashing
-  const handleMouseMove = useCallback(throttle((e) => {
+  // Throttled tilt handler using useMemo to satisfy ESLint dependency tracking
+  const handleMouseMove = useMemo(() => throttle((e) => {
     if (!isMobile) {
       if (!canTilt()) return;
       const poster = posterRef.current;
