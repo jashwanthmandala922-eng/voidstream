@@ -170,7 +170,17 @@ export default function Navbar() {
           left: 0;
           right: 0;
           z-index: 1000;
-          transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), background 0.4s ease;
+          transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), background 0.4s ease, backdrop-filter 0.4s ease;
+          background: rgba(10, 10, 10, 0.25);
+          backdrop-filter: blur(14px);
+          -webkit-backdrop-filter: blur(14px);
+        }
+
+        .premium-navbar.scrolled {
+          background: rgba(8, 8, 8, 0.45);
+          backdrop-filter: blur(34px) saturate(200%);
+          -webkit-backdrop-filter: blur(34px) saturate(200%);
+          border-bottom: 1px solid rgba(255, 255, 255, 0.04);
         }
 
         .premium-navbar.hidden {
