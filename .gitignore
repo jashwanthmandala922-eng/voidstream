@@ -3,3 +3,4 @@ server/node_modules
 build
 .env
 node_modules
+src/App.jsx

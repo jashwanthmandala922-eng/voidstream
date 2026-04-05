@@ -1,5 +1,5 @@
 import {
-  BrowserRouter, Routes, Route, useLocation, useNavigate
+  BrowserRouter, Routes, Route, useLocation
 } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';

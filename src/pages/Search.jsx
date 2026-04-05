@@ -85,7 +85,7 @@ export default function Search() {
       setTotalPgs(Math.min(data.total_pages || 1, 500));
     } catch (e) { console.error(e); }
     setLoading(false);
-  }, [page, searchQ]);
+  }, [page, searchQ, isMobile]);
 
   useEffect(() => { setPage(1); }, [searchQ]);
   useEffect(() => { fetchData(); }, [fetchData, isMobile]);
