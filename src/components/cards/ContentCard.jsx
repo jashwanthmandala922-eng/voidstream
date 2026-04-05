@@ -1,7 +1,8 @@
-import { useRef, useCallback, useState, useEffect } from 'react';
+import { memo, useRef, useCallback, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { img, getVideos } from '../../services/tmdbService';
 import { isWishlisted, addToWishlist, removeFromWishlist, getSettings } from '../../services/storageService';
+import { throttle } from '../../services/performanceService';
 import { useToast } from '../../context/ToastContext';
 import { Star, Plus, Check, Volume2, VolumeX } from 'lucide-react';
 
@@ -11,7 +12,7 @@ const canTilt = () =>
 
 const isMobileDevice = () => !window.matchMedia('(pointer: fine)').matches;
 
-export default function ContentCard({ item, size = 'normal' }) {
+const ContentCard = memo(function ContentCard({ item, size = 'normal' }) {
   const cardRef = useRef(null);
   const posterRef = useRef(null);
   const navigate = useNavigate();
@@ -39,7 +40,8 @@ export default function ContentCard({ item, size = 'normal' }) {
   const route = type === 'movie' ? '/movie' : type === 'anime' ? '/anime' : '/series';
   const isMobile = isMobileDevice();
 
-  const handleMouseMove = useCallback((e) => {
+  // Throttled tilt handler to prevent layout thrashing
+  const handleMouseMove = useCallback(throttle((e) => {
     if (!isMobile) {
       if (!canTilt()) return;
       const poster = posterRef.current;
@@ -47,14 +49,14 @@ export default function ContentCard({ item, size = 'normal' }) {
       const rect = poster.getBoundingClientRect();
       const x = (e.clientX - rect.left) / rect.width - 0.5;
       const y = (e.clientY - rect.top) / rect.height - 0.5;
-      poster.style.setProperty('--rx', `${y * -28}deg`); // Brisk 28-degree tilt
+      poster.style.setProperty('--rx', `${y * -28}deg`);
       poster.style.setProperty('--ry', `${x * 28}deg`);
       const shine = poster.querySelector('[data-shine]');
       if (shine) {
         shine.style.background = `radial-gradient(circle at ${x * 100 + 50}% ${y * 100 + 50}%, rgba(255,255,255,0.15) 0%, transparent 60%)`;
       }
     }
-  }, [isMobile]);
+  }, 16), [isMobile]);
 
   const clearAll = useCallback(() => {
     isHoveredRef.current = false;
@@ -427,4 +429,6 @@ export default function ContentCard({ item, size = 'normal' }) {
       `}</style>
     </div>
   );
-}
+});
+
+export default ContentCard;

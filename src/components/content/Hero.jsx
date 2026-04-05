@@ -70,7 +70,7 @@ export default function Hero({ items }) {
     >
       {/* BACKDROP */}
       <div className="hero-backdrop-container">
-        <img src={img(item.backdrop_path, 'original')} alt="" className="hero-backdrop-img" key={item.backdrop_path} />
+        <img src={img(item.backdrop_path, 'w1280')} alt="" className="hero-backdrop-img" key={item.backdrop_path} />
         <div className="hero-vignette" />
       </div>
 

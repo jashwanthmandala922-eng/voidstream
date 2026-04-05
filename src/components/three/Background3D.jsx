@@ -145,27 +145,28 @@ function WebGLBackground({ tier }) {
     }, 16);
     window.addEventListener('mousemove', onMouseMove, { passive: true });
 
-    // ── FRAME-CAPPED ANIMATE LOOP (30 fps cap) ────────────────────
+    // ── FRAME-CAPPED ANIMATE LOOP (60 fps cap for smoothness) ────────────────
     let frameId;
     const clock    = new THREE.Clock();
-    const TARGET_INTERVAL = 1000 / 30; // 30 fps
+    const TARGET_INTERVAL = 1000 / 60; // 60 fps for smooth animation
     let lastTime   = 0;
 
     const animate = (now = 0) => {
       frameId = requestAnimationFrame(animate);
-      if (now - lastTime < TARGET_INTERVAL) return; // skip frame
+      if (now - lastTime < TARGET_INTERVAL) return; 
       lastTime = now;
 
       const t = clock.getElapsedTime();
 
-      // Particle drift
-      const pos = particles.geometry.attributes.position.array;
+      // Particle drift - slightly faster and smoother
+      const posAttr = particles.geometry.attributes.position;
+      const pos = posAttr.array;
       for (let i = 0; i < pCount; i++) {
-        pos[i * 3 + 1] += velocities[i] * 0.25;
+        pos[i * 3 + 1] += velocities[i] * 0.35;
         if (pos[i * 3 + 1] > 150) pos[i * 3 + 1] = -150;
       }
-      particles.geometry.attributes.position.needsUpdate = true;
-      particles.rotation.y = t * 0.008;
+      posAttr.needsUpdate = true;
+      particles.rotation.y = t * 0.006;
 
       // Grid scroll
       gridHelper.position.z = (t * 3.5) % 6;
