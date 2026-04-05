@@ -5,9 +5,7 @@ import { isWishlisted, addToWishlist, removeFromWishlist, getHistory } from '../
 import ContentCard from '../components/cards/ContentCard';
 import VideoPlayer from '../components/content/VideoPlayer';
 import { useToast } from '../context/ToastContext';
-import { Play, Plus, Check, Star, Clock, Globe, ExternalLink } from 'lucide-react';
-
-const isMobileDevice = () => !window.matchMedia('(pointer: fine)').matches;
+import { Play, Plus, Check, Star, Clock, Globe } from 'lucide-react';
 
 export default function Detail({ type }) {
   const { id } = useParams();
@@ -22,7 +20,6 @@ export default function Detail({ type }) {
   const [playing, setPlaying] = useState(null);
   const [wishlisted, setWishlisted] = useState(false);
   const [overflowExp, setOverflowExp] = useState(false);
-  const [showTrailerModal, setShowTrailerModal] = useState(false);
   const [showInlineTrailer, setShowInlineTrailer] = useState(false);
 
   const mediaId = parseInt(id);
@@ -244,20 +241,6 @@ export default function Detail({ type }) {
         )}
       </div>
 
-      {/* TRAILER MODAL (fallback for fullscreen) */}
-      {showTrailerModal && trailerVideo && (
-        <div className="detail-trailer-modal" onClick={() => setShowTrailerModal(false)}>
-          <div className="detail-trailer-inner" onClick={e => e.stopPropagation()}>
-            <iframe
-              src={`https://www.youtube.com/embed/${trailerVideo.key}`}
-              title="Trailer"
-              frameBorder="0"
-              allowFullScreen
-              className="detail-trailer-iframe"
-            />
-          </div>
-        </div>
-      )}
 
       <style>{`
         .detail-root {
