@@ -278,7 +278,7 @@ function DesktopSettings() {
         {/* Sidebar */}
         <aside className="settings-sidebar">
           <div className="settings-sidebar-header">
-            <span className="settings-sidebar-logo">VOID<span style={{ color: 'var(--accent)' }}>STREAM</span></span>
+            <span className="settings-sidebar-logo">VOID<span style={{ color: 'var(--accent)' }}>FLIX</span></span>
             <span className="settings-sidebar-sub">Settings</span>
           </div>
           <nav className="settings-sidebar-nav">

@@ -4,15 +4,16 @@ import {
 } from 'lucide-react';
 
 const SOURCES = [
-  { id: 'vidlink', label: 'VIDLINK', buildUrl: (t, id, s, e) => t === 'movie' ? `https://vidlink.pro/movie/${encodeURIComponent(id)}?primaryColor=007AFF` : `https://vidlink.pro/tv/${encodeURIComponent(id)}/${encodeURIComponent(s)}/${encodeURIComponent(e)}?primaryColor=007AFF` },
-  { id: 'vidapi', label: 'VIDAPI.RU', buildUrl: (t, id, s, e) => t === 'movie' ? `https://vidapi.ru/embed/movie/${encodeURIComponent(id)}` : `https://vidapi.ru/embed/tv/${encodeURIComponent(id)}/${encodeURIComponent(s)}/${encodeURIComponent(e)}` },
-  { id: 'vidsrc', label: 'VIDSRC.ME', buildUrl: (t, id, s, e) => t === 'movie' ? `https://vidsrc.me/embed/movie?tmdb=${encodeURIComponent(id)}` : `https://vidsrc.me/embed/tv?tmdb=${encodeURIComponent(id)}&season=${encodeURIComponent(s)}&episode=${encodeURIComponent(e)}` },
+  { id: 'neural', label: 'NEURAL (ULTRA HD)', buildUrl: (t, id, s, e) => `/player.html?id=${encodeURIComponent(id)}&type=${encodeURIComponent(t)}&s=${encodeURIComponent(s)}&e=${encodeURIComponent(e)}` },
+  { id: 'vidsrc_to', label: 'VIDSRC.TO (BEST)', buildUrl: (t, id, s, e) => t === 'movie' ? `https://vidsrc.to/embed/movie/${encodeURIComponent(id)}` : `https://vidsrc.to/embed/tv/${encodeURIComponent(id)}/${encodeURIComponent(s)}/${encodeURIComponent(e)}` },
+  { id: 'vidlink', label: 'VIDLINK (FAST)', buildUrl: (t, id, s, e) => t === 'movie' ? `https://vidlink.pro/movie/${encodeURIComponent(id)}?primaryColor=007AFF` : `https://vidlink.pro/tv/${encodeURIComponent(id)}/${encodeURIComponent(s)}/${encodeURIComponent(e)}?primaryColor=007AFF` },
   { id: 'embedsu', label: 'EMBED.SU', buildUrl: (t, id, s, e) => t === 'movie' ? `https://embed.su/embed/movie/${encodeURIComponent(id)}` : `https://embed.su/embed/tv/${encodeURIComponent(id)}/${encodeURIComponent(s)}/${encodeURIComponent(e)}` },
+  { id: 'vidsrc_me', label: 'VIDSRC.ME', buildUrl: (t, id, s, e) => t === 'movie' ? `https://vidsrc.me/embed/movie?tmdb=${encodeURIComponent(id)}` : `https://vidsrc.me/embed/tv?tmdb=${encodeURIComponent(id)}&season=${encodeURIComponent(s)}&episode=${encodeURIComponent(e)}` },
 ];
 
 const NeuralPlayer = ({ tmdbId, type, season, episode, poster, title, mediaType, src: providedSrc }) => {
   const [showServerMenu, setShowServerMenu] = useState(false);
-  const [activeSourceIdx, setActiveSourceIdx] = useState(2); // vidsrc by default
+  const [activeSourceIdx, setActiveSourceIdx] = useState(0); // Neural Premium by default
   const [src, setSrc] = useState('');
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showControls, setShowControls] = useState(true);
@@ -172,9 +173,8 @@ const NeuralPlayer = ({ tmdbId, type, season, episode, poster, title, mediaType,
         </button>
       </div>
 
-      {/* Invisible Global Hover Layer (Only Top/Bottom Edges for responsiveness) */}
-      <div className="absolute inset-x-0 top-0 h-32 z-40 pointer-events-none group-hover/player:pointer-events-auto" />
-      <div className="absolute inset-x-0 bottom-0 h-32 z-40 pointer-events-none group-hover/player:pointer-events-auto" />
+      {/* Invisible Global Hover Layer - Minimal top strip to trigger controls without blocking iframe */}
+      <div className="absolute inset-x-0 top-0 h-16 z-40 pointer-events-none group-hover/player:pointer-events-auto" />
     </div>
   );
 };
