@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voidstream - Neural Player</title>
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon-blue: #007AFF;
+            --bg-dark: #050505;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            background: var(--bg-dark);
+            color: white;
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            aspect-ratio: 16/9;
+            position: relative;
+            box-shadow: 0 50px 100px rgba(0,0,0,0.8);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .plyr--full-ui.plyr--video .plyr__control--overlaid {
+            background: var(--neon-blue);
+        }
+        .plyr--video .plyr__control.plyr__tab-focus, .plyr--video .plyr__control:hover, .plyr--video .plyr__control[aria-expanded=true] {
+            background: var(--neon-blue);
+        }
+        .loading {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: var(--bg-dark);
+            z-index: 100;
+            transition: opacity 0.5s ease;
+        }
+        .loading.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .loader {
+            width: 48px;
+            height: 48px;
+            border: 5px solid #FFF;
+            border-bottom-color: var(--neon-blue);
+            border-radius: 50%;
+            display: inline-block;
+            box-sizing: border-box;
+            animation: rotation 1s linear infinite;
+        }
+        @keyframes rotation {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .loading-text {
+            margin-top: 20px;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            color: rgba(255,255,255,0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="loading" id="loading">
+        <span class="loader"></span>
+        <div class="loading-text">Establishing Uplink...</div>
+    </div>
+
+    <div class="container">
+        <video id="player" playsinline controls></video>
+    </div>
+
+    <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <script>
+        async function initPlayer() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const id = urlParams.get('id');
+            const type = urlParams.get('type') || 'movie';
+            const s = urlParams.get('s') || '1';
+            const e = urlParams.get('e') || '1';
+
+            if (!id) {
+                document.getElementById('loading').innerHTML = '<div class="loading-text">Error: No ID provided</div>';
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/vidlink/source/${type}/${id}?s=${s}&e=${e}`);
+                const data = await response.json();
+
+                if (!data || !data.file) {
+                    throw new Error('No stream found');
+                }
+
+                const video = document.getElementById('player');
+                const source = `/api/proxy/m3u8?url=${encodeURIComponent(data.file)}`;
+                
+                const plyrOptions = {
+                    tooltips: { controls: true, seek: true },
+                    captions: { active: true, update: true, language: 'en' }
+                };
+
+                if (Hls.isSupported()) {
+                    const hls = new Hls();
+                    hls.loadSource(source);
+                    hls.attachMedia(video);
+                    hls.on(Hls.Events.MANIFEST_PARSED, function () {
+                        const availableQualities = hls.levels.map((l) => l.height);
+                        plyrOptions.quality = {
+                            default: availableQualities[availableQualities.length - 1],
+                            options: availableQualities,
+                            forced: true,
+                            onChange: (q) => {
+                                hls.levels.forEach((level, levelIndex) => {
+                                    if (level.height === q) hls.currentLevel = levelIndex;
+                                });
+                            },
+                        };
+                        new Plyr(video, plyrOptions);
+                        document.getElementById('loading').classList.add('hidden');
+                    });
+                } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                    video.src = source;
+                    new Plyr(video, plyrOptions);
+                    document.getElementById('loading').classList.add('hidden');
+                }
+
+                if (data.captions && data.captions.length > 0) {
+                    data.captions.forEach(cap => {
+                        const track = document.createElement('track');
+                        track.kind = 'captions';
+                        track.label = cap.label;
+                        track.srclang = cap.language;
+                        track.src = cap.file;
+                        video.appendChild(track);
+                    });
+                }
+
+            } catch (err) {
+                console.error(err);
+                document.getElementById('loading').innerHTML = `<div class="loading-text">Error: ${err.message}</div>`;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', initPlayer);
+    </script>
+</body>
+</html>
