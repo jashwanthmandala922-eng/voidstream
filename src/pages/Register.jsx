@@ -89,7 +89,7 @@ export default function Register() {
             fontWeight: 900, fontSize: '32px',
             color: 'var(--white)', letterSpacing: '-1px', marginBottom: '4px'
           }}>
-            VOIDSTREAM
+            VOIDFLIX
           </h1>
           <p style={{
             fontFamily: "'Inter', sans-serif", fontSize: '14px', 

@@ -70,7 +70,7 @@ export default function Navbar() {
           <div className="nav-left">
             {/* LOGO */}
             <Link to="/" className="premium-logo">
-              VOID<span className="premium-logo-accent">STREAM</span>
+              VOID<span className="premium-logo-accent">FLIX</span>
             </Link>
 
             {/* NAVIGATION LINKS */}

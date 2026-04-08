@@ -44,7 +44,7 @@ export default function ForgotPassword() {
         animation: 'float 5s ease-in-out infinite'
       }}>
         <h1 style={{ fontFamily: "'Orbitron', monospace", fontWeight: 900, fontSize: '24px', color: 'var(--green)', textAlign: 'center', textShadow: 'var(--glow-md)', marginBottom: '8px', letterSpacing: '2px' }}>
-          VOIDSTREAM
+          VOIDFLIX
         </h1>
         <p style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: '13px', color: 'var(--dim)', textAlign: 'center', marginBottom: '36px' }}>
           {typed}<span className="cursor-blink" style={{ color: 'var(--green)' }}>█</span>

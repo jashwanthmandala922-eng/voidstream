@@ -2,11 +2,11 @@ import { executeQuery, executeMutation, getDataConnect } from 'firebase/data-con
 import app, { auth } from '../config/firebase';
 
 const KEYS = {
-  SETTINGS: 'voidstream_settings',
-  GUEST:    'voidstream_guest',
-  USERNAME: 'voidstream_username',
-  WISHLIST: 'voidstream_wishlist',
-  HISTORY:  'voidstream_history'
+  SETTINGS: 'voidflix_settings',
+  GUEST:    'voidflix_guest',
+  USERNAME: 'voidflix_username',
+  WISHLIST: 'voidflix_wishlist',
+  HISTORY:  'voidflix_history'
 };
 
 /**
@@ -16,7 +16,7 @@ let dc = null;
 const getDC = () => {
     if (!dc) {
         dc = getDataConnect(app, {
-            service: 'voidstream',
+            service: 'voidflix',
             location: 'asia-southeast1',
             connector: 'watch'
         });
@@ -55,7 +55,7 @@ export const setGuest = (v) => localStorage.setItem(KEYS.GUEST, v);
 export const getWishlist = async () => {
   if (isGuest()) {
     try {
-      return JSON.parse(localStorage.getItem('voidstream_wishlist') || '[]');
+      return JSON.parse(localStorage.getItem('voidflix_wishlist') || '[]');
     } catch { return []; }
   }
   if (!auth || !auth.currentUser) return [];
@@ -81,10 +81,10 @@ export const getWishlist = async () => {
 
 export const addToWishlist = async (item) => {
   if (isGuest()) {
-    const list = JSON.parse(localStorage.getItem('voidstream_wishlist') || '[]');
+    const list = JSON.parse(localStorage.getItem('voidflix_wishlist') || '[]');
     if (!list.find(i => String(i.id) === String(item.id))) {
       list.push(item);
-      localStorage.setItem('voidstream_wishlist', JSON.stringify(list));
+      localStorage.setItem('voidflix_wishlist', JSON.stringify(list));
     }
     return true;
   }
@@ -108,8 +108,8 @@ export const addToWishlist = async (item) => {
 
 export const removeFromWishlist = async (id, type) => {
   if (isGuest()) {
-    const list = JSON.parse(localStorage.getItem('voidstream_wishlist') || '[]');
-    localStorage.setItem('voidstream_wishlist', JSON.stringify(list.filter(i => String(i.id) !== String(id))));
+    const list = JSON.parse(localStorage.getItem('voidflix_wishlist') || '[]');
+    localStorage.setItem('voidflix_wishlist', JSON.stringify(list.filter(i => String(i.id) !== String(id))));
     return;
   }
   if (!auth || !auth.currentUser) return;
@@ -149,7 +149,7 @@ export const clearWishlist = async () => {
 export const getHistory = async () => {
   if (isGuest()) {
     try {
-      return JSON.parse(localStorage.getItem('voidstream_history') || '[]');
+      return JSON.parse(localStorage.getItem('voidflix_history') || '[]');
     } catch { return []; }
   }
   if (!auth || !auth.currentUser) return [];
@@ -176,11 +176,11 @@ export const getHistory = async () => {
 
 export const addToHistory = async (item) => {
   if (isGuest()) {
-    const hist = JSON.parse(localStorage.getItem('voidstream_history') || '[]');
+    const hist = JSON.parse(localStorage.getItem('voidflix_history') || '[]');
     const idx = hist.findIndex(i => String(i.id) === String(item.id));
     if (idx !== -1) hist.splice(idx, 1);
     hist.unshift(item);
-    localStorage.setItem('voidstream_history', JSON.stringify(hist.slice(0, 20)));
+    localStorage.setItem('voidflix_history', JSON.stringify(hist.slice(0, 20)));
     return;
   }
   if (!auth || !auth.currentUser) return;
@@ -201,8 +201,8 @@ export const addToHistory = async (item) => {
 
 export const removeFromHistory = async (id, type) => {
   if (isGuest()) {
-    const hist = JSON.parse(localStorage.getItem('voidstream_history') || '[]');
-    localStorage.setItem('voidstream_history', JSON.stringify(hist.filter(i => String(i.id) !== String(id))));
+    const hist = JSON.parse(localStorage.getItem('voidflix_history') || '[]');
+    localStorage.setItem('voidflix_history', JSON.stringify(hist.filter(i => String(i.id) !== String(id))));
     return;
   }
   if (!auth || !auth.currentUser) return;
@@ -220,7 +220,7 @@ export const removeFromHistory = async (id, type) => {
 
 export const clearHistory = async () => {
   if (isGuest()) {
-    localStorage.removeItem('voidstream_history');
+    localStorage.removeItem('voidflix_history');
     return;
   }
   if (!auth || !auth.currentUser) return;
@@ -252,8 +252,14 @@ export const exportHistory = async () => {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = 'voidstream_history.json';
+  a.download = 'voidflix_history.json';
   a.click();
+  
+  // Cleanup
+  setTimeout(() => {
+    URL.revokeObjectURL(url);
+    a.href = '';
+  }, 100);
 };
 
 export const exportWishlist = async () => {
@@ -262,8 +268,14 @@ export const exportWishlist = async () => {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = 'voidstream_wishlist.json';
+  a.download = 'voidflix_wishlist.json';
   a.click();
+
+  // Cleanup
+  setTimeout(() => {
+    URL.revokeObjectURL(url);
+    a.href = '';
+  }, 100);
 };
 
 /**

@@ -1,5 +1,5 @@
 /**
- * Performance Service for Voidstream
+ * Performance Service for Voidflix
  * Handles FPS monitoring, event throttling, and layout read/write optimization.
  */
 

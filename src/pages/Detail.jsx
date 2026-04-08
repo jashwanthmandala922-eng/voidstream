@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { getMovie, getTVShow, getSeason, getSimilarMovies, getSimilarTV, img } from '../services/tmdbService';
 import { isWishlisted, addToWishlist, removeFromWishlist, getHistory } from '../services/storageService';
 import ContentCard from '../components/cards/ContentCard';
-import VideoPlayer from '../components/content/VideoPlayer';
+import NeuralPlayer from '../components/content/NeuralPlayer';
 import { useToast } from '../context/ToastContext';
 import { Play, Plus, Check, Star, Clock, Globe } from 'lucide-react';
 
@@ -191,7 +191,17 @@ export default function Detail({ type }) {
         {/* PLAYER */}
         <div ref={playerRef} className="detail-player-wrap">
           {playing && (
-            <VideoPlayer tmdbId={mediaId} type={isMovie ? 'movie' : 'tv'} season={playing.season} episode={playing.episode} episodeTitle={playing.title} poster={img(detail.poster_path)} title={title} mediaType={type} year={year} />
+            <NeuralPlayer 
+              tmdbId={mediaId} 
+              type={isMovie ? 'movie' : 'tv'} 
+              season={playing.season} 
+              episode={playing.episode} 
+              episodeTitle={playing.title} 
+              poster={img(detail.poster_path)} 
+              title={title} 
+              mediaType={type} 
+              year={year} 
+            />
           )}
         </div>
 

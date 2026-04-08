@@ -23,7 +23,7 @@ export default function Login() {
     setError(''); setLoading(true);
     try {
       await loginUser(email, password);
-      addToast('Welcome back to Voidstream', 'success');
+      addToast('Welcome back to Voidflix', 'success');
       navigate('/');
     } catch (e) { setError(parseAuthError(e.code)); }
     setLoading(false);
@@ -105,7 +105,7 @@ export default function Login() {
             fontWeight: 900, fontSize: '32px',
             color: 'var(--white)', letterSpacing: '-1px', marginBottom: '4px'
           }}>
-            VOIDSTREAM
+            VOIDFLIX
           </h1>
           <p style={{
             fontFamily: "'Inter', sans-serif", fontSize: '14px', 
@@ -197,7 +197,7 @@ export default function Login() {
               fontFamily: "'Inter'", fontSize: '14px', lineHeight: 1.6, 
               color: 'rgba(255,255,255,0.5)', textAlign: 'center', marginBottom: '32px' 
             }}>
-              Guest mode allows you to use Voidstream without an account, but your history and watchlist won't be synced across devices.
+              Guest mode allows you to use Voidflix without an account, but your history and watchlist won't be synced across devices.
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <button onClick={handleGuest} style={btnStyle(true)}>Confirm Guest Session</button>

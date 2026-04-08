@@ -1,5 +1,5 @@
 specVersion: "v1"
-serviceId: "voidstream"
+serviceId: "voidflix"
 location: "asia-southeast1"
 schemas:
   - source: "./schema"
@@ -7,7 +7,7 @@ schemas:
       postgresql:
         database: "fdcdb"
         cloudSql:
-          instanceId: "voidstream-fdc"
+          instanceId: "voidflix-fdc"
           # schemaValidation: "STRICT"     # STRICT mode makes Postgres schema match Data Connect exactly.
           # schemaValidation: "COMPATIBLE" # COMPATIBLE mode makes Postgres schema compatible with Data Connect.
 connectorDirs:

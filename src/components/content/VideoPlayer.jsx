@@ -347,7 +347,7 @@ const SOURCES = [
               </div>
             )}
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
-              <div style={{ fontFamily: "'Montserrat'", fontSize: '12px', color: 'var(--white)', fontWeight: 900, letterSpacing: '6px', opacity: 0.9 }}>VOIDSTREAM V1.0</div>
+              <div style={{ fontFamily: "'Montserrat'", fontSize: '12px', color: 'var(--white)', fontWeight: 900, letterSpacing: '6px', opacity: 0.9 }}>VOIDFLIX V1.0</div>
               <div style={{ width: '220px', height: '2px', background: 'rgba(255, 0, 0, 0.1)', overflow: 'hidden', borderRadius: '1px', border: '1px solid rgba(255,255,255,0.05)' }}>
                 <div style={{ height: '100%', background: 'var(--accent)', boxShadow: '0 0 20px var(--accent)', animation: 'loadBar 2s cubic-bezier(0.65, 0, 0.35, 1) infinite' }} />
               </div>

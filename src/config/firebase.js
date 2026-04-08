@@ -17,7 +17,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const dataConnect = getDataConnect(app, {
-  service: 'voidstream',
+  service: 'voidflix',
   location: 'asia-southeast1',
   connector: 'watch'
 });
