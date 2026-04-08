@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { 
-  Check, Satellite, Maximize, Minimize
+  Satellite, Maximize, Minimize
 } from 'lucide-react';
 
 const SOURCES = [
