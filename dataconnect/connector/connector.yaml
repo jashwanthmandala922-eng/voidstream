@@ -1,5 +1,0 @@
-connectorId: "watch"
-generate:
-  javascriptSdk:
-    outputDir: "../../src/generated-sdk"
-    package: "@voidflix/sdk"
